@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from 'react'; // Changed from "import type * as React from 'react';"
+import * as React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Region, Topic } from '@/types/lexigen';
 
@@ -14,6 +14,8 @@ interface RadarViewProps extends React.HTMLAttributes<HTMLDivElement> {
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 const PADDING = 60; // For labels outside the main radar circle
+const TOPIC_LABEL_OFFSET_Y = 18; // Offset for the topic name label below the dot
+const TOPIC_DOT_RADIUS = 6;
 
 export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
   ({ regions, topics, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT, className, ...props }, ref) => {
@@ -68,8 +70,8 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
             {/* Draw region circles and labels */}
             {regions.map((region, index) => {
               const outerR = (numRegions - index) * bandThickness; // Draw from outermost to innermost for correct layering
-              const currentRegionIndex = numRegions - 1 - index; // Actual index from center (0 = innermost)
-              const labelPos = getRegionLabelPosition(currentRegionIndex);
+              // const currentRegionIndex = numRegions - 1 - index; // Actual index from center (0 = innermost)
+              // const labelPos = getRegionLabelPosition(currentRegionIndex);
 
               return (
                 <g key={region.id}>
@@ -88,7 +90,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                     textAnchor="middle"
                     fontSize="12"
                     fill={region.textColor}
-                    className="font-semibold"
+                    className="font-semibold select-none pointer-events-none"
                   >
                     {region.name}
                   </text>
@@ -132,19 +134,32 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
             {/* Draw topics */}
             {topics.map((topic) => {
               const { x, y } = getTopicCoordinates(topic);
+              const topicRegion = regions.find(r => r.id === topic.regionId);
               return (
-                <Tooltip key={topic.id}>
-                  <TooltipTrigger asChild>
-                    <g transform={`translate(${x}, ${y})`}>
-                       <circle r="6" fill="hsl(var(--primary))" stroke="hsl(var(--background))" strokeWidth="1.5" className="cursor-pointer"/>
-                       <circle r="3" fill="hsl(var(--primary-foreground))" className="cursor-pointer" />
-                    </g>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="font-semibold">{topic.name}</p>
-                    <p className="text-sm text-muted-foreground">Region: {regions.find(r => r.id === topic.regionId)?.name}</p>
-                  </TooltipContent>
-                </Tooltip>
+                <g key={topic.id}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <g transform={`translate(${x}, ${y})`} className="cursor-pointer">
+                         <circle r={TOPIC_DOT_RADIUS} fill="hsl(var(--primary))" stroke="hsl(var(--background))" strokeWidth="1.5" />
+                         <circle r={TOPIC_DOT_RADIUS/2} fill="hsl(var(--primary-foreground))" />
+                      </g>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="font-semibold">{topic.name}</p>
+                      <p className="text-sm text-muted-foreground">Region: {topicRegion?.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <text
+                    x={x}
+                    y={y + TOPIC_LABEL_OFFSET_Y}
+                    textAnchor="middle"
+                    fontSize="10"
+                    fill={topicRegion?.textColor || "hsl(var(--foreground))"}
+                    className="font-medium select-none pointer-events-none"
+                  >
+                    {topic.name}
+                  </text>
+                </g>
               );
             })}
           </svg>
