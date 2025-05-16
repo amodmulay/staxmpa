@@ -1,6 +1,6 @@
 "use client";
 
-import type * as React from 'react';
+import * as React from 'react'; // Changed from "import type * as React from 'react';"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Region, Topic } from '@/types/lexigen';
 
