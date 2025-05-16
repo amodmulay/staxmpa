@@ -1,48 +1,112 @@
+
 "use client";
 
 import type * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 import { Button } from '@/components/ui/button';
 import { TopicForm } from '@/components/lexigen/TopicForm';
 import { RadarView } from '@/components/lexigen/RadarView';
 import { AppHeader } from '@/components/lexigen/AppHeader';
-import type { Region, Topic } from '@/types/lexigen';
+import type { Region, Topic, ThemeDefinition, BaseRegion } from '@/types/lexigen';
 import { Download, Settings2, Palette } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ThemeSelector } from '@/components/lexigen/ThemeSelector'; // New component
 
-const initialRegions: Region[] = [
-  { id: 'today', name: 'Today', color: 'hsla(207, 90%, 90%, 0.7)', textColor: 'hsl(220, 10%, 40%)' },
-  { id: 'tomorrow', name: 'Tomorrow', color: 'hsla(207, 90%, 85%, 0.7)', textColor: 'hsl(220, 10%, 35%)' },
-  { id: 'recent-future', name: 'Recent Future', color: 'hsla(207, 90%, 80%, 0.7)', textColor: 'hsl(220, 10%, 30%)' },
-  { id: 'distant-future', name: 'Distant Future', color: 'hsla(207, 90%, 75%, 0.7)', textColor: 'hsl(220, 10%, 25%)' },
+const initialRegionDefinitions: BaseRegion[] = [
+  { id: 'today', name: 'Today' },
+  { id: 'tomorrow', name: 'Tomorrow' },
+  { id: 'recent-future', name: 'Recent Future' },
+  { id: 'distant-future', name: 'Distant Future' },
 ];
 
-// Function to generate distinct HSL colors for regions if not specified
-const generateRegionColors = (regions: Omit<Region, 'color' | 'textColor'>[]): Region[] => {
+// --- THEME DEFINITIONS ---
+
+const generateDefaultColors: ThemeDefinition['generateColors'] = (baseRegions) => {
   const baseHue = 207; // Base hue for blue
-  const saturation = 70; // Fixed saturation
-  const baseLightness = 92; // Start with a light color
-  const lightnessStep = -5; // Decrease lightness for outer rings
-  
+  const saturation = 70;
+  const baseLightness = 92;
+  const lightnessStep = -5;
   const textBaseLightness = 30;
   const textLightnessStep = 5;
 
-
-  return regions.map((region, index) => ({
+  return baseRegions.map((region, index) => ({
     ...region,
     color: `hsla(${baseHue}, ${saturation}%, ${baseLightness + index * lightnessStep}%, 0.6)`,
     textColor: `hsl(${baseHue - 10}, ${saturation-50}%, ${textBaseLightness + index * textLightnessStep}%)`,
   }));
 };
 
+const generateMaterialDarkColors: ThemeDefinition['generateColors'] = (baseRegions) => {
+  const HUE = 210;
+  const SAT = 10;
+  return baseRegions.map((region, index) => ({
+    ...region,
+    color: `hsla(${HUE}, ${SAT}%, ${20 + index * 6}%, 0.75)`, // Darker, slightly increasing lightness
+    textColor: `hsl(${HUE}, ${SAT}%, ${85 - index * 5}%)`, // Light text
+  }));
+};
+
+const generateMaterialLightIndigoColors: ThemeDefinition['generateColors'] = (baseRegions) => {
+  const HUE = 230; // Indigo-ish
+  const SAT = 55;
+  return baseRegions.map((region, index) => ({
+    ...region,
+    color: `hsla(${HUE}, ${SAT}%, ${96 - index * 8}%, 0.65)`, // Light to darker indigo shades
+    textColor: `hsl(${HUE}, ${SAT-25}%, ${25 + index * 6}%)`, // Darker text, good contrast
+  }));
+};
+
+const generateMonochromeColors: ThemeDefinition['generateColors'] = (baseRegions) => {
+  return baseRegions.map((region, index) => ({
+    ...region,
+    color: `hsla(0, 0%, ${90 - index * 12}%, 0.7)`, // Shades of gray from light to dark
+    textColor: `hsl(0, 0%, ${15 + index * 5}%)`, // Dark text, ensuring readability
+  }));
+};
+
+const appThemes: ThemeDefinition[] = [
+  {
+    id: 'default',
+    name: 'Default Teal',
+    generateColors: generateDefaultColors,
+    topicDotColor: 'hsl(var(--primary))', // Uses CSS variable for dots
+    screenshotBackgroundColor: 'hsl(var(--background))',
+  },
+  {
+    id: 'materialDark',
+    name: 'Material Dark',
+    generateColors: generateMaterialDarkColors,
+    topicDotColor: '#BB86FC', // Material Purple A200
+    screenshotBackgroundColor: 'hsl(220,15%,10%)', // Matches dark theme background
+  },
+  {
+    id: 'materialLightIndigo',
+    name: 'Material Light (Indigo)',
+    generateColors: generateMaterialLightIndigoColors,
+    topicDotColor: '#3F51B5', // Material Indigo 500
+    screenshotBackgroundColor: 'hsl(0,0%,100%)',
+  },
+  {
+    id: 'monochrome',
+    name: 'Monochrome',
+    generateColors: generateMonochromeColors,
+    topicDotColor: '#212121', // Dark Gray
+    screenshotBackgroundColor: 'hsl(0,0%,100%)',
+  },
+];
+
+// --- END THEME DEFINITIONS ---
 
 export default function LexiGenPage() {
-  const [regions, setRegions] = useState<Region[]>(generateRegionColors(initialRegions.map(({color, textColor, ...rest}) => rest)));
+  const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
+  const [selectedThemeId, setSelectedThemeId] = useState<string>(appThemes[0].id);
+  const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
+
   const [topics, setTopics] = useState<Topic[]>([]);
   const radarRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -52,6 +116,18 @@ export default function LexiGenPage() {
     setMounted(true);
   }, []);
 
+  const currentTheme = useMemo(() => {
+    return appThemes.find(t => t.id === selectedThemeId) || appThemes[0];
+  }, [selectedThemeId]);
+
+  const regions: Region[] = useMemo(() => {
+    const themeColoredRegions = currentTheme.generateColors(baseRegionDefinitions);
+    return themeColoredRegions.map(tr => ({
+      ...tr,
+      ...(customColorOverrides[tr.id] || {}),
+    }));
+  }, [baseRegionDefinitions, currentTheme, customColorOverrides]);
+
 
   const handleAddTopic = (name: string, regionId: string) => {
     const newTopic: Topic = {
@@ -59,7 +135,7 @@ export default function LexiGenPage() {
       name,
       regionId,
       angle: Math.random() * 360,
-      magnitude: 0.3 + Math.random() * 0.4, // Place between 30% and 70% of band width
+      magnitude: 0.3 + Math.random() * 0.4,
     };
     setTopics((prevTopics) => [...prevTopics, newTopic]);
     toast({
@@ -71,11 +147,22 @@ export default function LexiGenPage() {
   const handleScreenshot = async () => {
     if (radarRef.current) {
       try {
-        const canvas = await html2canvas(radarRef.current, { 
+        // Use a background color consistent with the current theme for the screenshot
+        // If the theme has a specific screenshot background, use it, otherwise let html2canvas infer from element.
+        const canvasOptions: Partial<html2canvas.Options> = { 
           useCORS: true,
-          backgroundColor: '#E3F2FD', // Explicitly set background for screenshot
           scale: 2, // Increase scale for better resolution
-         });
+        };
+        if (currentTheme.screenshotBackgroundColor && currentTheme.id !== 'default') { // 'default' relies on CSS var
+          canvasOptions.backgroundColor = currentTheme.screenshotBackgroundColor;
+        } else if (currentTheme.id === 'default') {
+            // For default, attempt to get it from the computed style of the radar view or fallback
+            const radarStyle = window.getComputedStyle(radarRef.current);
+            canvasOptions.backgroundColor = radarStyle.backgroundColor || '#E3F2FD';
+        }
+
+
+        const canvas = await html2canvas(radarRef.current, canvasOptions);
         const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = image;
@@ -97,41 +184,59 @@ export default function LexiGenPage() {
       }
     }
   };
+  
+  const handleThemeChange = (themeId: string) => {
+    setSelectedThemeId(themeId);
+    setCustomColorOverrides({}); // Clear custom colors when theme changes
+    toast({ title: "Theme Changed", description: `Switched to ${appThemes.find(t=>t.id===themeId)?.name || 'selected'} theme.`});
+  };
 
   const handleRegionConfigChange = (index: number, field: 'name' | 'color' | 'textColor', value: string) => {
-    setRegions(prevRegions => {
-      const updatedRegions = [...prevRegions];
-      updatedRegions[index] = { ...updatedRegions[index], [field]: value };
-      return updatedRegions;
-    });
+    const regionIdToUpdate = baseRegionDefinitions[index]?.id;
+    if (!regionIdToUpdate) return;
+
+    if (field === 'name') {
+      setBaseRegionDefinitions(prev => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], name: value };
+        return updated;
+      });
+    } else {
+      // Update custom overrides for color or textColor
+      setCustomColorOverrides(prev => ({
+        ...prev,
+        [regionIdToUpdate]: {
+          ...prev[regionIdToUpdate],
+          [field]: value,
+        }
+      }));
+    }
   };
 
   const handleAddRegion = () => {
     const newRegionId = `region-${Date.now()}`;
-    const newRegionName = `New Region ${regions.length + 1}`;
-    const placeholderRegions = [...regions.map(r => ({id: r.id, name: r.name})), {id: newRegionId, name: newRegionName }];
-    const coloredRegions = generateRegionColors(placeholderRegions);
-    setRegions(coloredRegions);
-     toast({ title: "Region Added", description: `"${newRegionName}" configuration added.` });
+    const newRegionName = `New Region ${baseRegionDefinitions.length + 1}`;
+    setBaseRegionDefinitions(prev => [...prev, { id: newRegionId, name: newRegionName }]);
+    toast({ title: "Region Added", description: `"${newRegionName}" configuration added.` });
   };
   
   const handleRemoveRegion = (idToRemove: string) => {
-    if (regions.length <= 1) {
-       toast({ title: "Cannot Remove", description: "At least one region must remain.", variant: "destructive" });
+    if (baseRegionDefinitions.length <= 1) {
+      toast({ title: "Cannot Remove", description: "At least one region must remain.", variant: "destructive" });
       return;
     }
-    const placeholderRegions = regions.filter(r => r.id !== idToRemove).map(r => ({id: r.id, name: r.name}));
-    const coloredRegions = generateRegionColors(placeholderRegions);
-    setRegions(coloredRegions);
-    // Also remove topics associated with this region
+    setBaseRegionDefinitions(prev => prev.filter(r => r.id !== idToRemove));
+    setCustomColorOverrides(prev => {
+      const updated = {...prev};
+      delete updated[idToRemove];
+      return updated;
+    });
     setTopics(prevTopics => prevTopics.filter(topic => topic.regionId !== idToRemove));
     toast({ title: "Region Removed", description: "Region and associated topics removed." });
   };
 
 
   if (!mounted) {
-    // Render a loading state or null until the component is mounted
-    // This helps avoid hydration mismatches with Math.random() or other client-side only logic
     return (
       <div className="flex flex-col min-h-screen">
         <AppHeader />
@@ -147,7 +252,6 @@ export default function LexiGenPage() {
       <AppHeader />
       <main className="flex-grow container mx-auto p-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Controls */}
           <div className="lg:col-span-1 space-y-6">
             <TopicForm regions={regions} onAddTopic={handleAddTopic} />
             
@@ -159,6 +263,11 @@ export default function LexiGenPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <ThemeSelector 
+                  themes={appThemes} 
+                  selectedThemeId={selectedThemeId} 
+                  onSelectTheme={handleThemeChange} 
+                />
                 <Button onClick={handleScreenshot} className="w-full">
                   <Download className="mr-2 h-4 w-4" />
                   Capture Screenshot
@@ -180,7 +289,7 @@ export default function LexiGenPage() {
                         <Input
                           id={`region-color-${index}`}
                           type="color"
-                          value={region.color.startsWith('hsla') ? hslToHex(region.color) : region.color} // Basic conversion for input type=color
+                          value={region.color.startsWith('hsl') ? hslToHex(region.color) : region.color}
                           onChange={(e) => handleRegionConfigChange(index, 'color', e.target.value)}
                           className="w-16 h-8 p-1"
                         />
@@ -192,7 +301,7 @@ export default function LexiGenPage() {
                           onChange={(e) => handleRegionConfigChange(index, 'textColor', e.target.value)}
                            className="w-16 h-8 p-1"
                         />
-                        <Button variant="destructive" size="sm" onClick={() => handleRemoveRegion(region.id)} disabled={regions.length <=1 }>&times;</Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>&times;</Button>
                       </div>
                     </Card>
                   ))}
@@ -205,14 +314,20 @@ export default function LexiGenPage() {
             </Card>
           </div>
 
-          {/* Right Column: Radar View */}
           <div className="lg:col-span-2 flex items-center justify-center">
             <Card className="shadow-xl w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-xl text-center">Topic Radar</CardTitle>
               </CardHeader>
               <CardContent className="flex justify-center items-center p-2 md:p-4">
-                <RadarView ref={radarRef} regions={regions} topics={topics} width={600} height={600} />
+                <RadarView 
+                  ref={radarRef} 
+                  regions={regions} 
+                  topics={topics} 
+                  width={600} 
+                  height={600}
+                  topicDotColor={currentTheme.topicDotColor}
+                />
               </CardContent>
             </Card>
           </div>
@@ -225,10 +340,9 @@ export default function LexiGenPage() {
   );
 }
 
-// Helper function to convert HSL(A) to HEX for color input (simplified)
 function hslToHex(hslStr: string): string {
   const match = hslStr.match(/hsla?\((\d+),\s*([\d.]+)%,\s*([\d.]+)%(?:,\s*([\d.]+))?\)/);
-  if (!match) return '#000000'; // Fallback
+  if (!match) return '#000000'; 
 
   let h = parseInt(match[1]);
   let s = parseInt(match[2]) / 100;
@@ -253,4 +367,3 @@ function hslToHex(hslStr: string): string {
   const toHex = (val: number) => val.toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
-
