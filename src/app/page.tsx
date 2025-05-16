@@ -147,20 +147,16 @@ export default function LexiGenPage() {
   const handleScreenshot = async () => {
     if (radarRef.current) {
       try {
-        // Use a background color consistent with the current theme for the screenshot
-        // If the theme has a specific screenshot background, use it, otherwise let html2canvas infer from element.
         const canvasOptions: Partial<html2canvas.Options> = { 
           useCORS: true,
-          scale: 2, // Increase scale for better resolution
+          scale: 2, 
         };
-        if (currentTheme.screenshotBackgroundColor && currentTheme.id !== 'default') { // 'default' relies on CSS var
+        if (currentTheme.screenshotBackgroundColor && currentTheme.id !== 'default') { 
           canvasOptions.backgroundColor = currentTheme.screenshotBackgroundColor;
         } else if (currentTheme.id === 'default') {
-            // For default, attempt to get it from the computed style of the radar view or fallback
             const radarStyle = window.getComputedStyle(radarRef.current);
             canvasOptions.backgroundColor = radarStyle.backgroundColor || '#E3F2FD';
         }
-
 
         const canvas = await html2canvas(radarRef.current, canvasOptions);
         const image = canvas.toDataURL('image/png');
@@ -187,7 +183,7 @@ export default function LexiGenPage() {
   
   const handleThemeChange = (themeId: string) => {
     setSelectedThemeId(themeId);
-    setCustomColorOverrides({}); // Clear custom colors when theme changes
+    setCustomColorOverrides({}); 
     toast({ title: "Theme Changed", description: `Switched to ${appThemes.find(t=>t.id===themeId)?.name || 'selected'} theme.`});
   };
 
@@ -202,7 +198,6 @@ export default function LexiGenPage() {
         return updated;
       });
     } else {
-      // Update custom overrides for color or textColor
       setCustomColorOverrides(prev => ({
         ...prev,
         [regionIdToUpdate]: {
@@ -252,10 +247,14 @@ export default function LexiGenPage() {
       <AppHeader />
       <main className="flex-grow container mx-auto p-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 space-y-6">
+          {/* Column 1: Add New Topic */}
+          <div className="lg:col-span-1">
             <TopicForm regions={regions} onAddTopic={handleAddTopic} />
-            
-            <Card className="shadow-lg">
+          </div>
+          
+          {/* Column 2: Radar Configuration */}
+          <div className="lg:col-span-1">
+            <Card className="shadow-lg h-full">
               <CardHeader>
                 <CardTitle className="flex items-center text-xl">
                   <Settings2 className="mr-2 h-6 w-6 text-primary" />
@@ -314,7 +313,8 @@ export default function LexiGenPage() {
             </Card>
           </div>
 
-          <div className="lg:col-span-2 flex items-center justify-center">
+          {/* Column 3: Topic Radar */}
+          <div className="lg:col-span-1 flex items-center justify-center">
             <Card className="shadow-xl w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-xl text-center">Topic Radar</CardTitle>
@@ -367,3 +367,4 @@ function hslToHex(hslStr: string): string {
   const toHex = (val: number) => val.toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+
