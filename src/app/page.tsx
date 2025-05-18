@@ -246,71 +246,70 @@ export default function LexiGenPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
       <main className="flex-grow container mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Column 1: Controls (TopicForm and RadarConfiguration) */}
-          <div className="space-y-6">
-            <TopicForm regions={regions} onAddTopic={handleAddTopic} />
+        <div className="grid grid-cols-1 gap-6">
+          {/* Item 1: TopicForm */}
+          <TopicForm regions={regions} onAddTopic={handleAddTopic} />
             
-            <Card className="shadow-lg h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center text-xl">
-                  <Settings2 className="mr-2 h-6 w-6 text-primary" />
-                  Radar Configuration
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ThemeSelector 
-                  themes={appThemes} 
-                  selectedThemeId={selectedThemeId} 
-                  onSelectTheme={handleThemeChange} 
-                />
-                <Button onClick={handleScreenshot} className="w-full">
-                  <Download className="mr-2 h-4 w-4" />
-                  Capture Screenshot
-                </Button>
-                <ScrollArea className="h-[250px] pr-3">
-                  <div className="space-y-3">
-                  {regions.map((region, index) => (
-                    <Card key={region.id} className="p-3 bg-muted/50">
-                      <Label htmlFor={`region-name-${index}`} className="text-sm font-medium">Region {index + 1}: {region.name}</Label>
+          {/* Item 2: RadarConfiguration Card */}
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center text-xl">
+                <Settings2 className="mr-2 h-6 w-6 text-primary" />
+                Radar Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ThemeSelector 
+                themes={appThemes} 
+                selectedThemeId={selectedThemeId} 
+                onSelectTheme={handleThemeChange} 
+              />
+              <Button onClick={handleScreenshot} className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                Capture Screenshot
+              </Button>
+              <ScrollArea className="h-[250px] pr-3">
+                <div className="space-y-3">
+                {regions.map((region, index) => (
+                  <Card key={region.id} className="p-3 bg-muted/50">
+                    <Label htmlFor={`region-name-${index}`} className="text-sm font-medium">Region {index + 1}: {region.name}</Label>
+                    <Input
+                      id={`region-name-${index}`}
+                      type="text"
+                      value={region.name}
+                      onChange={(e) => handleRegionConfigChange(index, 'name', e.target.value)}
+                      className="mt-1 mb-2"
+                    />
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor={`region-color-${index}`} className="text-xs">Band Color:</Label>
                       <Input
-                        id={`region-name-${index}`}
-                        type="text"
-                        value={region.name}
-                        onChange={(e) => handleRegionConfigChange(index, 'name', e.target.value)}
-                        className="mt-1 mb-2"
+                        id={`region-color-${index}`}
+                        type="color"
+                        value={region.color.startsWith('hsl') ? hslToHex(region.color) : region.color}
+                        onChange={(e) => handleRegionConfigChange(index, 'color', e.target.value)}
+                        className="w-16 h-8 p-1"
                       />
-                      <div className="flex items-center space-x-2">
-                        <Label htmlFor={`region-color-${index}`} className="text-xs">Band Color:</Label>
-                        <Input
-                          id={`region-color-${index}`}
-                          type="color"
-                          value={region.color.startsWith('hsl') ? hslToHex(region.color) : region.color}
-                          onChange={(e) => handleRegionConfigChange(index, 'color', e.target.value)}
+                        <Label htmlFor={`region-text-color-${index}`} className="text-xs">Text Color:</Label>
+                      <Input
+                        id={`region-text-color-${index}`}
+                        type="color"
+                        value={region.textColor.startsWith('hsl') ? hslToHex(region.textColor) : region.textColor}
+                        onChange={(e) => handleRegionConfigChange(index, 'textColor', e.target.value)}
                           className="w-16 h-8 p-1"
-                        />
-                         <Label htmlFor={`region-text-color-${index}`} className="text-xs">Text Color:</Label>
-                        <Input
-                          id={`region-text-color-${index}`}
-                          type="color"
-                          value={region.textColor.startsWith('hsl') ? hslToHex(region.textColor) : region.textColor}
-                          onChange={(e) => handleRegionConfigChange(index, 'textColor', e.target.value)}
-                           className="w-16 h-8 p-1"
-                        />
-                        <Button variant="destructive" size="sm" onClick={() => handleRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>&times;</Button>
-                      </div>
-                    </Card>
-                  ))}
-                  </div>
-                </ScrollArea>
-                 <Button onClick={handleAddRegion} variant="outline" className="w-full">
-                  <Palette className="mr-2 h-4 w-4" /> Add Region
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                      />
+                      <Button variant="destructive" size="sm" onClick={() => handleRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>&times;</Button>
+                    </div>
+                  </Card>
+                ))}
+                </div>
+              </ScrollArea>
+                <Button onClick={handleAddRegion} variant="outline" className="w-full">
+                <Palette className="mr-2 h-4 w-4" /> Add Region
+              </Button>
+            </CardContent>
+          </Card>
 
-          {/* Column 2: Topic Radar */}
+          {/* Item 3: Topic Radar Card */}
           <div className="flex items-center justify-center">
             <Card className="shadow-xl w-full overflow-hidden">
               <CardHeader>
