@@ -235,7 +235,7 @@ export default function LexiGenPage() {
     return (
       <div className="flex flex-col min-h-screen">
         <AppHeader />
-        <div className="flex-grow container mx-auto p-4 flex items-center justify-center">
+        <div className="flex-grow w-full max-w-[80%] mx-auto p-4 flex items-center justify-center">
           <p>Loading LexiGen...</p>
         </div>
       </div>
@@ -245,7 +245,7 @@ export default function LexiGenPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
-      <main className="flex-grow container mx-auto p-4">
+      <main className="flex-grow w-full max-w-[80%] mx-auto p-4">
         <div className="grid grid-cols-1 gap-6">
           {/* Item 1: TopicForm */}
           <TopicForm regions={regions} onAddTopic={handleAddTopic} />
