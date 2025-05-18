@@ -246,14 +246,11 @@ export default function LexiGenPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
       <main className="flex-grow container mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Column 1: Add New Topic */}
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Column 1: Controls (TopicForm and RadarConfiguration) */}
+          <div className="space-y-6">
             <TopicForm regions={regions} onAddTopic={handleAddTopic} />
-          </div>
-          
-          {/* Column 2: Radar Configuration */}
-          <div className="lg:col-span-1">
+            
             <Card className="shadow-lg h-full">
               <CardHeader>
                 <CardTitle className="flex items-center text-xl">
@@ -313,8 +310,8 @@ export default function LexiGenPage() {
             </Card>
           </div>
 
-          {/* Column 3: Topic Radar */}
-          <div className="lg:col-span-1 flex items-center justify-center">
+          {/* Column 2: Topic Radar */}
+          <div className="flex items-center justify-center">
             <Card className="shadow-xl w-full overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-xl text-center">Topic Radar</CardTitle>
