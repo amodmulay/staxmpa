@@ -1,8 +1,8 @@
 
 "use client";
 
-import type * as React from 'react';
-import { useForm, type SubmitHandler, Controller } from 'react-hook-form';
+import React from 'react'; // Changed from type-only import
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
