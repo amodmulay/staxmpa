@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ThemeSelector } from '@/components/lexigen/ThemeSelector'; // New component
+import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 import TopicList from '@/components/lexigen/TopicList';
 
 const initialRegionDefinitions: BaseRegion[] = [
@@ -255,11 +255,9 @@ export default function LexiGenPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
       <main className="flex-grow w-full max-w-[80%] mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> {/* This is the main grid container */}
-          <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-6"> 
           <TopicForm regions={regions} onAddTopic={handleAddTopic} />
             
-          {/* Item 2: RadarConfiguration Card */}
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center text-xl">
@@ -317,10 +315,7 @@ export default function LexiGenPage() {
               </Button>
             </CardContent>
           </Card>
-
-          </div> {/* Close the first column div */}
-
-          <div className="lg:col-span-2 flex flex-col gap-6"> {/* This is the second/third column container */}
+          
           <div className="flex items-center justify-center flex-grow">
             <Card className="shadow-xl w-full overflow-hidden flex-grow">
               <CardHeader>
@@ -338,14 +333,13 @@ export default function LexiGenPage() {
               </CardContent>
             </Card>
           </div>
+          
+          <Card className="shadow-lg">
+             <TopicList topics={topics} onRemoveTopic={handleRemoveTopic} regions={regions} />
+          </Card>
+        
 
-          {/* Item 4: Topic List Card */}
-            <Card className="shadow-lg">
-             <TopicList topics={topics} onRemoveTopic={handleRemoveTopic} />
-            </Card>
-        </div>
-
-      </div> {/* Close the main grid container */}
+      </div> 
     </main>
  <footer className="text-center p-4 text-sm text-muted-foreground border-t">
         LexiGen &copy; {new Date().getFullYear()}
@@ -381,4 +375,3 @@ function hslToHex(hslStr: string): string {
   const toHex = (val: number) => val.toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
-
