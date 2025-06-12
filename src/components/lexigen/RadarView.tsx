@@ -1,7 +1,7 @@
 
 "use client";
 
-import * as React from 'react'; // Full import for React.forwardRef and React.useRef
+import React, { useState, useEffect, useMemo } from 'react'; // Full import for React
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Draggable from 'react-draggable';
 import type { Region, Topic } from '@/types/lexigen';
@@ -20,22 +20,118 @@ const PADDING = 60;
 const TOPIC_LABEL_OFFSET_Y = 18;
 const TOPIC_DOT_RADIUS = 6;
 
+// Define DraggableTopicItem outside of RadarView or memoize if inside
+interface DraggableTopicItemProps {
+  topic: Topic;
+  position: { x: number; y: number };
+  onStop: (event: any, data: any) => void;
+  topicRegion?: Region;
+  dotFillColor: string;
+}
+
+const DraggableTopicItem: React.FC<DraggableTopicItemProps> = ({
+  topic,
+  position,
+  onStop,
+  topicRegion,
+  dotFillColor,
+}) => {
+  const nodeRef = React.useRef<SVGGElement>(null); // Called once per DraggableTopicItem instance
+
+  return (
+    <Draggable
+      nodeRef={nodeRef} // Pass the stable ref
+      position={position}
+      onStop={onStop}
+      // Removed key from here as it's on the parent mapping
+    >
+      <g ref={nodeRef} className="group"> {/* Assign the ref to the <g> element */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <g className="cursor-pointer">
+              <circle r={TOPIC_DOT_RADIUS} fill={dotFillColor} stroke="hsl(var(--background))" strokeWidth="1.5" />
+              <circle r={TOPIC_DOT_RADIUS / 2} fill={topicRegion?.color.startsWith('hsl(0, 0%, 20%)') || topicRegion?.color.startsWith('hsla(0, 0%, 20%)') ? 'hsl(var(--background))' : 'hsl(var(--primary-foreground))'} />
+            </g>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="font-semibold">{topic.name}</p>
+            <p className="text-sm text-muted-foreground">Region: {topicRegion?.name}</p>
+          </TooltipContent>
+        </Tooltip>
+        <text
+          x={0} // Positioned relative to the draggable <g>
+          y={TOPIC_LABEL_OFFSET_Y} // Positioned relative to the draggable <g>
+          textAnchor="middle"
+          fontSize="10"
+          fill={topicRegion?.textColor || "hsl(var(--foreground))"}
+          className="font-medium select-none pointer-events-none"
+        >
+          {topic.name}
+        </text>
+      </g>
+    </Draggable>
+  );
+};
+DraggableTopicItem.displayName = "DraggableTopicItem";
+
+
 export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
   ({ regions, topics, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT, className, topicDotColor, ...props }, ref) => {
     const centerX = width / 2;
     const centerY = height / 2;
     const radarRadius = Math.min(centerX, centerY) - PADDING;
 
-    const [topicPositions, setTopicPositions] = React.useState<{ [key: string]: { x: number; y: number } }>({});
+    const [topicPositions, setTopicPositions] = useState<{ [key: string]: { x: number; y: number } }>({});
 
-    React.useEffect(() => {
-      const initialPositions: { [key: string]: { x: number; y: number } } = {};
+    const getTopicCoordinates = React.useCallback((topic: Topic) => {
+      const regionIndex = regions.findIndex(r => r.id === topic.regionId);
+      if (regionIndex === -1) return { x: centerX, y: centerY };
+
+      const numRegions = regions.length;
+      if (numRegions === 0) return { x: centerX, y: centerY }; // Should not happen if regions exist
+      const bandThickness = radarRadius / numRegions;
+
+      const innerRadiusForRegion = regionIndex * bandThickness;
+      const thicknessForRegion = bandThickness;
+
+      const distanceFromCenter = innerRadiusForRegion + topic.magnitude * thicknessForRegion;
+      const angleRad = (topic.angle - 90) * (Math.PI / 180);
+
+      return {
+        x: centerX + distanceFromCenter * Math.cos(angleRad),
+        y: centerY + distanceFromCenter * Math.sin(angleRad),
+      };
+    }, [regions, centerX, centerY, radarRadius]);
+
+
+    useEffect(() => {
+      const newPositions: { [key: string]: { x: number; y: number } } = {};
       topics.forEach(topic => {
-        initialPositions[topic.id] = getTopicCoordinates(topic);
+        newPositions[topic.id] = getTopicCoordinates(topic);
       });
-      setTopicPositions(initialPositions);
+      // Only update positions if they are different to avoid potential loops
+      // or if a topic is added/removed.
+      // A more robust way would be to only initialize new topics or update if coordinates truly changed.
+      setTopicPositions(prevPositions => {
+        const updatedPositions = { ...prevPositions };
+        topics.forEach(topic => {
+            // Initialize if not present or re-calculate based on getTopicCoordinates if structure changed.
+            // For simplicity, this re-initializes all based on current props.
+            // If preserving dragged positions across minor (non-geometric) region changes is needed,
+            // this logic would need to be more nuanced.
+            updatedPositions[topic.id] = getTopicCoordinates(topic);
+        });
+        // Filter out positions for topics that no longer exist
+        const topicIds = new Set(topics.map(t => t.id));
+        Object.keys(updatedPositions).forEach(id => {
+            if (!topicIds.has(id)) {
+                delete updatedPositions[id];
+            }
+        });
+        return updatedPositions;
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [topics, regions, width, height]); // Recalculate initial positions when topics, regions or dimensions change
+    }, [topics, regions, width, height, getTopicCoordinates]); 
 
     const numRegions = regions.length;
 
@@ -48,22 +144,6 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
     }
 
     const bandThickness = radarRadius / numRegions;
-
-    const getTopicCoordinates = (topic: Topic) => {
-      const regionIndex = regions.findIndex(r => r.id === topic.regionId);
-      if (regionIndex === -1) return { x: centerX, y: centerY };
-
-      const innerRadiusForRegion = regionIndex * bandThickness;
-      const thicknessForRegion = bandThickness;
-
-      const distanceFromCenter = innerRadiusForRegion + topic.magnitude * thicknessForRegion;
-      const angleRad = (topic.angle - 90) * (Math.PI / 180);
-
-      return {
-        x: centerX + distanceFromCenter * Math.cos(angleRad),
-        y: centerY + distanceFromCenter * Math.sin(angleRad),
-      };
-    };
 
     return (
       <div ref={ref} className={className} {...props} style={{ width, height, background: 'hsl(var(--background))' }}>
@@ -126,51 +206,24 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
             })}
 
             {topics.map((topic) => {
-              const nodeRef = React.useRef<SVGGElement>(null); // Create a ref for each draggable item
-              const initialPosition = getTopicCoordinates(topic);
-              // Use position from state if available, otherwise use calculated initialPosition
-              const currentPosition = topicPositions[topic.id] || initialPosition;
+              const currentPosition = topicPositions[topic.id] || getTopicCoordinates(topic);
               const topicRegion = regions.find(r => r.id === topic.regionId);
               const dotFillColor = topicDotColor || 'hsl(var(--primary))';
 
               return (
-                <Draggable
-                  key={topic.id}
-                  nodeRef={nodeRef} // Pass the ref here
-                  position={currentPosition} // Use currentPosition for controlled component
+                <DraggableTopicItem
+                  key={topic.id} // Key for the list item
+                  topic={topic}
+                  position={currentPosition}
                   onStop={(e, data) => {
                     setTopicPositions(prevPositions => ({
                       ...prevPositions,
                       [topic.id]: { x: data.x, y: data.y },
                     }));
                   }}
-                  // Since we are controlling position, remove defaultPosition to avoid conflicts
-                >
-                  <g ref={nodeRef} className="group"> {/* Assign the ref to the <g> element */}
-                    <Tooltip>
-                    <TooltipTrigger asChild>
-                      <g className="cursor-pointer">
-                         <circle r={TOPIC_DOT_RADIUS} fill={dotFillColor} stroke="hsl(var(--background))" strokeWidth="1.5" />
-                         <circle r={TOPIC_DOT_RADIUS/2} fill={topicRegion?.color.startsWith('hsl(0, 0%, 20%)') || topicRegion?.color.startsWith('hsla(0, 0%, 20%)') ? 'hsl(var(--background))' : 'hsl(var(--primary-foreground))'} />
-                      </g>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="font-semibold">{topic.name}</p>
-                      <p className="text-sm text-muted-foreground">Region: {topicRegion?.name}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <text
-                    x={0}
-                    y={TOPIC_LABEL_OFFSET_Y}
-                    textAnchor="middle"
-                    fontSize="10"
-                    fill={topicRegion?.textColor || "hsl(var(--foreground))"}
-                    className="font-medium select-none pointer-events-none"
-                  >
-                    {topic.name}
-                  </text>
-                  </g>
-                </Draggable>
+                  topicRegion={topicRegion}
+                  dotFillColor={dotFillColor}
+                />
               );
             })}
           </svg>
