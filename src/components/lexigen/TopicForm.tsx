@@ -1,3 +1,4 @@
+
 "use client";
 
 import type * as React from 'react';
@@ -29,13 +30,25 @@ export function TopicForm({ regions, onAddTopic }: TopicFormProps) {
     resolver: zodResolver(topicFormSchema),
     defaultValues: {
       name: "",
-      regionId: "",
+      regionId: regions.length > 0 ? regions[0].id : "", // Default to first region if available
     },
   });
 
+  // Effect to update default regionId if regions change or on initial load
+  React.useEffect(() => {
+    if (regions.length > 0 && !form.getValues("regionId")) {
+      form.setValue("regionId", regions[0].id);
+    }
+  }, [regions, form]);
+
+
   const onSubmit: SubmitHandler<TopicFormData> = (data) => {
+    const currentRegionId = data.regionId;
     onAddTopic(data.name, data.regionId);
-    form.reset();
+    form.reset({
+      name: "",
+      regionId: currentRegionId, // Retain the last selected region
+    });
   };
 
   return (
@@ -68,7 +81,11 @@ export function TopicForm({ regions, onAddTopic }: TopicFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Region</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value || (regions.length > 0 ? regions[0].id : "")} // Ensure value is controlled
+                    key={regions.map(r => r.id).join('-')} // Re-key to force re-render if regions change
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a region" />
@@ -86,7 +103,7 @@ export function TopicForm({ regions, onAddTopic }: TopicFormProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={regions.length === 0}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Topic to Radar
             </Button>
