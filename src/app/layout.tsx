@@ -5,8 +5,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'LexiGen',
-  description: 'Generate radar views of topics by LexiGen',
+  title: 'StaxMap - Visualize Your Technology Landscape',
+  description: 'Create, customize, and share interactive technology radars with StaxMap.',
 };
 
 export default function RootLayout({
