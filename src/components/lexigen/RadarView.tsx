@@ -82,19 +82,24 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
     const radarRadius = Math.min(centerX, centerY) - PADDING;
 
     const [topicPositions, setTopicPositions] = useState<{ [key: string]: { x: number; y: number } }>({});
+    
+    // The regions are ordered from inner to outer (e.g., Adopt, Trial, Assess, Hold)
+    // The SVG is drawn from outer to inner. We must pass the original, non-reversed array to this component.
+    const reversedRegionsForRendering = useMemo(() => [...regions].reverse(), [regions]);
 
     const getTopicCoordinates = React.useCallback((topic: Topic) => {
       const regionIndex = regions.findIndex(r => r.id === topic.regionId);
       if (regionIndex === -1) return { x: centerX, y: centerY };
 
       const numRegions = regions.length;
-      if (numRegions === 0) return { x: centerX, y: centerY }; // Should not happen if regions exist
+      if (numRegions === 0) return { x: centerX, y: centerY };
       const bandThickness = radarRadius / numRegions;
 
+      // Calculate distance from center based on the region's index
+      // regionIndex 0 (e.g., "Adopt") should be closest to the center.
       const innerRadiusForRegion = regionIndex * bandThickness;
-      const thicknessForRegion = bandThickness;
-
-      const distanceFromCenter = innerRadiusForRegion + topic.magnitude * thicknessForRegion;
+      
+      const distanceFromCenter = innerRadiusForRegion + topic.magnitude * bandThickness;
       const angleRad = (topic.angle - 90) * (Math.PI / 180);
 
       return {
@@ -149,7 +154,9 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
       <div ref={ref} className={className} {...props} style={{ width, height, background: 'hsl(var(--background))' }}>
         <TooltipProvider>
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-            {regions.map((region, index) => {
+            {reversedRegionsForRendering.map((region, index) => {
+              // This calculation is now correct because we are iterating over the reversed array.
+              // index 0 = "Hold" (the outermost ring)
               const outerR = (numRegions - index) * bandThickness;
               return (
                 <g key={region.id}>

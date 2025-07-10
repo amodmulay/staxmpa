@@ -321,7 +321,7 @@ export default function RadarPage() {
           <CardContent className="flex justify-center items-center p-2 md:p-4">
             <RadarView 
               ref={radarRef} 
-              regions={[...regions].reverse()} 
+              regions={regions} 
               topics={topics} 
               width={600} 
               height={600}
