@@ -10,7 +10,7 @@ interface RadarViewProps extends React.HTMLAttributes<HTMLDivElement> {
   regions: Region[];
   topics: Topic[];
   topicPositions: Record<string, { x: number; y: number }>;
-  onTopicPositionChange: (topicId: string, position: { x: number; y: number }) => void;
+  onTopicPositionChange: (topicId: string, position: { x: number; y: number }, newRegionId?: string) => void;
   width?: number;
   height?: number;
   topicDotColor?: string;
@@ -114,6 +114,23 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
     }
 
     const bandThickness = radarRadius / numRegions;
+    
+    const handleDragStop = (topicId: string, data: DraggableData) => {
+        const { x, y } = data;
+        const deltaX = x - centerX;
+        const deltaY = y - centerY;
+        const distanceFromCenter = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+        // Calculate the new region based on the distance from the center
+        let newRegionIndex = Math.floor(distanceFromCenter / bandThickness);
+        // Clamp the index to be within the bounds of the regions array
+        newRegionIndex = Math.min(Math.max(newRegionIndex, 0), numRegions - 1);
+    
+        const newRegionId = regions[newRegionIndex]?.id;
+    
+        // Call the prop to update both position and region in the parent state
+        onTopicPositionChange(topicId, { x, y }, newRegionId);
+    };
 
     return (
       <div ref={ref} className={className} {...props} style={{ width, height, background: 'hsl(var(--background))' }}>
@@ -185,9 +202,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                   key={topic.id}
                   topic={topic}
                   position={currentPosition}
-                  onStop={(e, data) => {
-                    onTopicPositionChange(topic.id, { x: data.x, y: data.y });
-                  }}
+                  onStop={(e, data) => handleDragStop(topic.id, data)}
                   topicRegion={topicRegion}
                   dotFillColor={dotFillColor}
                 />

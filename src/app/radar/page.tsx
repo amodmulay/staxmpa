@@ -146,11 +146,21 @@ export default function RadarPage() {
     });
   };
 
-  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }) => {
+  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, newRegionId?: string) => {
+    // Update visual position
     setTopicPositions(prevPositions => ({
       ...prevPositions,
       [topicId]: position,
     }));
+    
+    // If a new region is determined, update the topic data
+    if (newRegionId) {
+        setTopics(prevTopics => 
+            prevTopics.map(topic => 
+                topic.id === topicId ? { ...topic, regionId: newRegionId } : topic
+            )
+        );
+    }
   };
 
   const handleScreenshot = async () => {
