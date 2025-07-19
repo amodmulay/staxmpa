@@ -6,7 +6,7 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 
 - **Dynamic Radar Creation**: Add and remove concentric regions (e.g., "Adopt", "Assess").
 - **Real-time Topic Management**: Add topics to different regions, and see them appear instantly on the radar.
-- **Interactive Visualization**: Drag-and-drop topics within the radar to fine-tune their position.
+- **Interactive Visualization**: Drag-and-drop topics within the radar to fine-tune their position and change their region.
 - **Theming and Customization**: Switch between pre-defined themes (Light, Dark, etc.) or customize the colors of each region to match your branding.
 - **Screenshot Capture**: Export a high-resolution PNG image of your radar for presentations and documentation.
 - **Filtering and Searching**: Easily find topics in the list with search and region-based filtering.
@@ -20,7 +20,7 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [ShadCN UI](https://ui.shadcn.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **AI/Generative Features**: [Google Genkit](https://firebase.google.com/docs/genkit) (Not yet fully implemented but configured)
+- **AI/Generative Features**: [Google Genkit](https://firebase.google.com/docs/genkit) (Configured but not yet implemented)
 - **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/)
 
 ## Getting Started
@@ -117,12 +117,62 @@ staxmap/
 
 ## Core Components and Logic
 
-- **`src/app/radar/page.tsx` (`RadarPage`)**: This is the main client component that holds the state for the entire radar application, including `topics`, `regions`, and `themes`. It contains all the handler functions for adding/removing topics and regions, changing themes, and taking screenshots.
+This section details the most important files and their functions within the application.
 
-- **`src/components/lexigen/RadarView.tsx`**: A pure presentation component that renders the SVG radar. It receives `regions` and `topics` as props and calculates their positions. It uses `react-draggable` to allow topics to be moved around.
+### `src/app/radar/page.tsx` (`RadarPage`)
 
-- **`src/components/lexigen/TopicForm.tsx`**: A form built with `react-hook-form` and `zod` for validation. It allows users to input a new topic name and select a region to add it to.
+This is the **central hub** of the application. As a client component (`"use client"`), it manages the entire state of the radar.
 
-- **`src/components/lexigen/TopicList.tsx`**: Displays a list of all added topics. Includes controls for filtering by region and searching by name.
+- **State Management**: It uses `useState` hooks to manage:
+    - `regions`: The array of radar rings (e.g., Adopt, Assess).
+    - `topics`: The array of technology topics added to the radar.
+    - `topicPositions`: The pixel coordinates of topics that have been manually dragged.
+    - `selectedThemeId`: The ID of the currently active theme.
+- **Core Functions**:
+    - `handleAddTopic`: Creates a new topic object with a random position and adds it to the `topics` state.
+    - `handleRemoveTopic`: Removes a topic from the `topics` state.
+    - `handleTopicPositionChange`: Updates a topic's pixel position and its `regionId` when it's dragged and dropped on the radar. This is crucial for syncing the data model with the UI.
+    - `handleThemeChange`: Updates the selected theme, causing the radar to re-render with new colors.
+    - `handleRegionConfigChange`: Allows users to change the name and colors of radar regions.
+    - `handleScreenshot`: Uses the `html2canvas` library to capture the radar view as a PNG and trigger a download.
 
-- **`src/types/lexigen.ts`**: This file is central to the application's data structure. It defines the `Region` and `Topic` interfaces, ensuring type safety across all components. It also defines the structure for `ThemeDefinition`, which allows for modular and extensible theming.
+### `src/components/lexigen/RadarView.tsx`
+
+This is a pure presentation component responsible for rendering the interactive SVG radar.
+
+- **Rendering Logic**:
+    - It receives `regions` and `topics` as props.
+    - It calculates the positions of the concentric circles based on the number of regions.
+    - It maps each topic to coordinates within its assigned region using trigonometry (`Math.cos`, `Math.sin`) based on the topic's `angle` and `magnitude`.
+- **Interactivity**:
+    - It uses `react-draggable` to allow each topic (rendered as a `<g>` element) to be moved.
+    - The `handleDragStop` function calculates the topic's new distance from the center to determine its new region and calls the `onTopicPositionChange` prop to update the state in the parent `RadarPage`.
+
+### `src/components/lexigen/TopicForm.tsx`
+
+A form for adding new topics to the radar.
+
+- **Technology**: Built with `react-hook-form` for state management and `zod` for schema-based validation.
+- **Functionality**:
+    - Takes the list of `regions` as a prop to populate the dropdown.
+    - On submission, it calls the `onAddTopic` function (passed from `RadarPage`) with the new topic's name and selected region ID.
+    - It retains the last selected region after submission for a smoother user experience.
+
+### `src/components/lexigen/TopicList.tsx`
+
+Displays a filterable and searchable list of all topics that have been added to the radar.
+
+- **Functionality**:
+    - Receives the full `topics` and `regions` arrays as props.
+    - Uses `useState` to manage local state for the search term and region filter.
+    - Uses `useMemo` to efficiently compute `filteredAndSortedTopics` whenever the topics or filters change.
+    - Renders a table showing the topic name and its current region (styled with a `Badge`).
+    - Includes a button to remove a topic, which calls the `onRemoveTopic` prop from `RadarPage`.
+
+### `src/types/lexigen.ts`
+
+This file is central to the application's data structure, defining the core types used across components.
+
+- **`Region`**: Defines the structure for a radar ring, including its `id`, `name`, `color`, and `textColor`.
+- **`Topic`**: Defines the structure for a technology topic, including its `id`, `name`, `regionId`, and its position (`angle` and `magnitude`).
+- **`ThemeDefinition`**: Defines the structure for a theme, which includes a `generateColors` function that dynamically creates region colors. This makes the theming system modular and extensible.
