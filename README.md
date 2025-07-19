@@ -75,6 +75,61 @@ npm test
 
 This will execute all `*.test.tsx` files and report the results in your terminal.
 
+## Architecture and State Management
+
+### Architecture Diagram
+
+The application follows a component-based architecture where the main page (`RadarPage`) acts as a central controller, managing state and passing data and functions down to child presentational components.
+
+```mermaid
+graph TD
+    subgraph "State & Logic Controller (Client Component)"
+        A[<b>RadarPage</b><br>(src/app/radar/page.tsx)<br><i>Manages all application state</i>]
+    end
+
+    subgraph "Presentational UI Components"
+        B[<b>TopicForm</b><br><i>Adds new topics</i>]
+        C[<b>RadarView</b><br><i>Renders the interactive SVG radar</i>]
+        D[<b>TopicList</b><br><i>Displays and filters all topics</i>]
+        E[<b>Radar Configuration</b><br><i>Controls themes, regions, and colors</i>]
+    end
+
+    A -- "regions, onAddTopic()" --> B
+    A -- "regions, topics, topicPositions, onTopicPositionChange()" --> C
+    A -- "topics, regions, onRemoveTopic()" --> D
+    A -- "regions, themes, onRegionConfigChange(), onThemeChange()" --> E
+
+    B -- "Calls onAddTopic()" --> A
+    C -- "Calls onTopicPositionChange()" --> A
+    D -- "Calls onRemoveTopic()" --> A
+    E -- "Calls config change handlers" --> A
+
+    style A fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px
+    style B fill:#fff,stroke:#333
+    style C fill:#fff,stroke:#333
+    style D fill:#fff,stroke:#333
+    style E fill:#fff,stroke:#333
+```
+
+### State Management
+
+The state management in StaxMap is intentionally simple and centralized, following standard React patterns without external state management libraries like Redux or Zustand.
+
+- **Single Source of Truth**: The `RadarPage` component (`src/app/radar/page.tsx`) is the heart of the application. Because it is a client component (`"use client"`), it can use React hooks to manage all the critical pieces of state:
+    - `regions`: The array of radar rings (e.g., Adopt, Assess).
+    - `topics`: The array of technology topics added to the radar.
+    - `topicPositions`: The pixel coordinates of topics that have been manually dragged. This state is crucial for persisting UI changes.
+    - `selectedThemeId`: The ID of the currently active theme.
+    - `customColorOverrides`: Custom colors applied to specific regions.
+
+- **Lifting State Up**: This is the core principle used. `RadarPage` holds the state and defines the functions that can modify it (e.g., `handleAddTopic`, `handleTopicPositionChange`).
+
+- **Unidirectional Data Flow**:
+    1.  **State is passed down**: `RadarPage` passes the state down to its child components as props (e.g., `RadarView` receives `topics` and `regions`). These child components are purely presentational; they render what they are given.
+    2.  **Actions are passed up**: When a user interacts with a child component (like clicking "Add Topic" in `TopicForm`), the component doesn't change the state directly. Instead, it calls a function (like `onAddTopic`) that was passed down to it as a prop. This function, which lives in `RadarPage`, is the only thing that can modify the state.
+
+This approach keeps the application predictable and easier to debug, as all state changes happen in one central location.
+
 ## Project Structure
 
 The codebase is organized to separate concerns and maintain a clean architecture.
@@ -123,11 +178,7 @@ This section details the most important files and their functions within the app
 
 This is the **central hub** of the application. As a client component (`"use client"`), it manages the entire state of the radar.
 
-- **State Management**: It uses `useState` hooks to manage:
-    - `regions`: The array of radar rings (e.g., Adopt, Assess).
-    - `topics`: The array of technology topics added to the radar.
-    - `topicPositions`: The pixel coordinates of topics that have been manually dragged.
-    - `selectedThemeId`: The ID of the currently active theme.
+- **State Management**: It uses `useState` hooks to manage all application state (see State Management section above).
 - **Core Functions**:
     - `handleAddTopic`: Creates a new topic object with a random position and adds it to the `topics` state.
     - `handleRemoveTopic`: Removes a topic from the `topics` state.
@@ -176,3 +227,5 @@ This file is central to the application's data structure, defining the core type
 - **`Region`**: Defines the structure for a radar ring, including its `id`, `name`, `color`, and `textColor`.
 - **`Topic`**: Defines the structure for a technology topic, including its `id`, `name`, `regionId`, and its position (`angle` and `magnitude`).
 - **`ThemeDefinition`**: Defines the structure for a theme, which includes a `generateColors` function that dynamically creates region colors. This makes the theming system modular and extensible.
+
+    
