@@ -106,8 +106,10 @@ export default function RadarPage() {
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
   const [selectedThemeId, setSelectedThemeId] = useState<string>(appThemes[0].id);
   const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
-
+  
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [topicPositions, setTopicPositions] = useState<Record<string, { x: number; y: number }>>({});
+
   const radarRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
@@ -142,6 +144,13 @@ export default function RadarPage() {
       title: "Topic Added",
       description: `"${name}" has been added to the radar.`,
     });
+  };
+
+  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }) => {
+    setTopicPositions(prevPositions => ({
+      ...prevPositions,
+      [topicId]: position,
+    }));
   };
 
   const handleScreenshot = async () => {
@@ -232,6 +241,11 @@ export default function RadarPage() {
 
   function handleRemoveTopic(topicId: string) {
     setTopics(topics.filter(topic => topic.id !== topicId));
+    setTopicPositions(prev => {
+      const updated = {...prev};
+      delete updated[topicId];
+      return updated;
+    });
     toast({
       title: "Topic Removed",
       description: "The topic has been removed from the radar and the list.",
@@ -323,6 +337,8 @@ export default function RadarPage() {
               ref={radarRef} 
               regions={regions} 
               topics={topics} 
+              topicPositions={topicPositions}
+              onTopicPositionChange={handleTopicPositionChange}
               width={600} 
               height={600}
               topicDotColor={currentTheme.topicDotColor}
@@ -364,3 +380,5 @@ function hslToHex(hslStr: string): string {
   const toHex = (val: number) => val.toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+
+    

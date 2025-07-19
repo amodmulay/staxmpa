@@ -1,14 +1,16 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react'; // Full import for React
+import React, { useMemo, useCallback } from 'react'; // Full import for React
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import Draggable from 'react-draggable';
+import Draggable, { type DraggableData, type DraggableEvent } from 'react-draggable';
 import type { Region, Topic } from '@/types/lexigen';
 
 interface RadarViewProps extends React.HTMLAttributes<HTMLDivElement> {
   regions: Region[];
   topics: Topic[];
+  topicPositions: Record<string, { x: number; y: number }>;
+  onTopicPositionChange: (topicId: string, position: { x: number; y: number }) => void;
   width?: number;
   height?: number;
   topicDotColor?: string;
@@ -24,7 +26,7 @@ const TOPIC_DOT_RADIUS = 6;
 interface DraggableTopicItemProps {
   topic: Topic;
   position: { x: number; y: number };
-  onStop: (event: any, data: any) => void;
+  onStop: (event: DraggableEvent, data: DraggableData) => void;
   topicRegion?: Region;
   dotFillColor: string;
 }
@@ -36,16 +38,15 @@ const DraggableTopicItem: React.FC<DraggableTopicItemProps> = ({
   topicRegion,
   dotFillColor,
 }) => {
-  const nodeRef = React.useRef<SVGGElement>(null); // Called once per DraggableTopicItem instance
+  const nodeRef = React.useRef<SVGGElement>(null); 
 
   return (
     <Draggable
-      nodeRef={nodeRef} // Pass the stable ref
+      nodeRef={nodeRef}
       position={position}
       onStop={onStop}
-      // Removed key from here as it's on the parent mapping
     >
-      <g ref={nodeRef} className="group"> {/* Assign the ref to the <g> element */}
+      <g ref={nodeRef} className="group">
         <Tooltip>
           <TooltipTrigger asChild>
             <g className="cursor-pointer">
@@ -59,8 +60,8 @@ const DraggableTopicItem: React.FC<DraggableTopicItemProps> = ({
           </TooltipContent>
         </Tooltip>
         <text
-          x={0} // Positioned relative to the draggable <g>
-          y={TOPIC_LABEL_OFFSET_Y} // Positioned relative to the draggable <g>
+          x={0}
+          y={TOPIC_LABEL_OFFSET_Y}
           textAnchor="middle"
           fontSize="10"
           fill={topicRegion?.textColor || "hsl(var(--foreground))"}
@@ -76,18 +77,14 @@ DraggableTopicItem.displayName = "DraggableTopicItem";
 
 
 export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
-  ({ regions, topics, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT, className, topicDotColor, ...props }, ref) => {
+  ({ regions, topics, topicPositions, onTopicPositionChange, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT, className, topicDotColor, ...props }, ref) => {
     const centerX = width / 2;
     const centerY = height / 2;
     const radarRadius = Math.min(centerX, centerY) - PADDING;
 
-    const [topicPositions, setTopicPositions] = useState<{ [key: string]: { x: number; y: number } }>({});
-    
-    // The regions are ordered from inner to outer (e.g., Adopt, Trial, Assess, Hold)
-    // The SVG is drawn from outer to inner. We must pass the original, non-reversed array to this component.
     const reversedRegionsForRendering = useMemo(() => [...regions].reverse(), [regions]);
 
-    const getTopicCoordinates = React.useCallback((topic: Topic) => {
+    const getTopicCoordinates = useCallback((topic: Topic) => {
       const regionIndex = regions.findIndex(r => r.id === topic.regionId);
       if (regionIndex === -1) return { x: centerX, y: centerY };
 
@@ -95,8 +92,6 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
       if (numRegions === 0) return { x: centerX, y: centerY };
       const bandThickness = radarRadius / numRegions;
 
-      // Calculate distance from center based on the region's index
-      // regionIndex 0 (e.g., "Adopt") should be closest to the center.
       const innerRadiusForRegion = regionIndex * bandThickness;
       
       const distanceFromCenter = innerRadiusForRegion + topic.magnitude * bandThickness;
@@ -107,36 +102,6 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
         y: centerY + distanceFromCenter * Math.sin(angleRad),
       };
     }, [regions, centerX, centerY, radarRadius]);
-
-
-    useEffect(() => {
-      const newPositions: { [key: string]: { x: number; y: number } } = {};
-      topics.forEach(topic => {
-        newPositions[topic.id] = getTopicCoordinates(topic);
-      });
-      // Only update positions if they are different to avoid potential loops
-      // or if a topic is added/removed.
-      // A more robust way would be to only initialize new topics or update if coordinates truly changed.
-      setTopicPositions(prevPositions => {
-        const updatedPositions = { ...prevPositions };
-        topics.forEach(topic => {
-            // Initialize if not present or re-calculate based on getTopicCoordinates if structure changed.
-            // For simplicity, this re-initializes all based on current props.
-            // If preserving dragged positions across minor (non-geometric) region changes is needed,
-            // this logic would need to be more nuanced.
-            updatedPositions[topic.id] = getTopicCoordinates(topic);
-        });
-        // Filter out positions for topics that no longer exist
-        const topicIds = new Set(topics.map(t => t.id));
-        Object.keys(updatedPositions).forEach(id => {
-            if (!topicIds.has(id)) {
-                delete updatedPositions[id];
-            }
-        });
-        return updatedPositions;
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [topics, regions, width, height, getTopicCoordinates]); 
 
     const numRegions = regions.length;
 
@@ -155,8 +120,6 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
         <TooltipProvider>
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
             {reversedRegionsForRendering.map((region, index) => {
-              // This calculation is now correct because we are iterating over the reversed array.
-              // index 0 = "Hold" (the outermost ring)
               const outerR = (numRegions - index) * bandThickness;
               return (
                 <g key={region.id}>
@@ -219,14 +182,11 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
 
               return (
                 <DraggableTopicItem
-                  key={topic.id} // Key for the list item
+                  key={topic.id}
                   topic={topic}
                   position={currentPosition}
                   onStop={(e, data) => {
-                    setTopicPositions(prevPositions => ({
-                      ...prevPositions,
-                      [topic.id]: { x: data.x, y: data.y },
-                    }));
+                    onTopicPositionChange(topic.id, { x: data.x, y: data.y });
                   }}
                   topicRegion={topicRegion}
                   dotFillColor={dotFillColor}
@@ -241,3 +201,5 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
 );
 
 RadarView.displayName = "RadarView";
+
+    
