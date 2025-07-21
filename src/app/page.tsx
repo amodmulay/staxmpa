@@ -12,7 +12,7 @@ export default function LandingPage() {
         <div className="container flex h-14 items-center">
           <Link href="/" className="flex items-center space-x-2">
             <Radar className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">StaxMap</span>
+            <span className="font-bold text-xl">RadarMap</span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-2">
@@ -26,8 +26,8 @@ export default function LandingPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="container grid lg:grid-cols-2 gap-10 items-center py-20 md:py-24">
-          <div className="flex flex-col items-start space-y-4">
+        <section className="container grid lg:grid-cols-1 gap-10 items-center py-20 md:py-24">
+          <div className="flex flex-col items-start space-y-4 ps-4">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter">
               Visualize Your Tech Landscape
             </h1>
@@ -41,16 +41,7 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
-          <div className="flex items-center justify-center">
-            <Image
-              src="https://placehold.co/600x400.png"
-              alt="Sample Radar"
-              width={600}
-              height={400}
-              className="rounded-xl shadow-2xl"
-              data-ai-hint="technology radar"
-            />
-          </div>
+
         </section>
 
         {/* Features Section */}
