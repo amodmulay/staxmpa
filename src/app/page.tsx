@@ -1,134 +1,106 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Radar, Palette, MousePointerClick, Zap } from 'lucide-react';
+import { ArrowRight, Code } from 'lucide-react';
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
+      <header className="sticky top-0 z-50 w-full">
+        <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <Radar className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">RadarMap</span>
+            <Code className="h-7 w-7" />
+            <span className="font-bold text-xl">StaxMap</span>
           </Link>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <nav className="flex items-center space-x-2">
-              <Link href="/radar">
-                <Button>Go to App</Button>
-              </Link>
-            </nav>
-          </div>
+          <nav className="flex items-center space-x-2">
+            <Link href="/radar">
+              <Button variant="ghost">Go to App <ArrowRight className="ml-2 h-4 w-4" /></Button>
+            </Link>
+          </nav>
         </div>
       </header>
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="container grid lg:grid-cols-1 gap-10 items-center py-20 md:py-24">
-          <div className="flex flex-col items-start space-y-4 ps-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter">
-              Visualize Your Tech Landscape
-            </h1>
-            <p className="max-w-[600px] text-lg text-muted-foreground">
-              StaxMap helps you create beautiful, interactive technology radars to map out topics, assess their maturity, and guide your strategy. Effortlessly build, customize, and share your vision.
-            </p>
-            <Link href="/radar">
-              <Button size="lg" className="mt-4">
-                Create Your Radar Now
-                <Zap className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+        <div className="relative isolate pt-14">
+          <div
+            className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+            aria-hidden="true"
+          >
+            <div
+              className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#8085ff] to-[#4c00ff] opacity-40 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+              style={{
+                clipPath:
+                  'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+              }}
+            />
           </div>
 
-        </section>
+          <div className="py-24 sm:py-32">
+            <div className="container mx-auto text-center">
+              <div className="flex justify-center mb-4">
+                <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-muted-foreground ring-1 ring-white/20 hover:ring-white/30">
+                  Power up with Agent Mode
+                </div>
+              </div>
 
-        {/* Features Section */}
-        <section id="features" className="container py-20 md:py-24 bg-muted/50 rounded-lg">
-          <div className="mx-auto flex flex-col items-center space-y-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold">Powerful Features, Simple Interface</h2>
-            <p className="max-w-2xl text-muted-foreground">
-              Everything you need to build a comprehensive technology radar, without the complexity.
-            </p>
-          </div>
-          <div className="mx-auto grid justify-center gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 mt-12">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">Dynamic Radars</CardTitle>
-                <Radar className="h-6 w-6 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Add topics and regions on-the-fly. The radar updates in real-time as you build it.</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">Customizable Themes</CardTitle>
-                <Palette className="h-6 w-6 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Choose from multiple themes or customize colors to match your brand identity perfectly.</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-medium">Interactive Elements</CardTitle>
-                <MousePointerClick className="h-6 w-6 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Drag and drop topics to fine-tune their position within the radar for precise mapping.</p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl max-w-3xl mx-auto">
+                AI accelerates your development
+              </h1>
+              
+              <div className="mt-10 flex items-center justify-center gap-x-6">
+                <Button size="lg">Start free trial</Button>
+                <Button size="lg" variant="secondary">Check plans and prices</Button>
+              </div>
 
-        {/* Sample Radars Section */}
-        <section className="container py-20 md:py-24">
-          <h2 className="text-center text-3xl md:text-4xl font-bold mb-12">See What You Can Create</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="flex flex-col items-center">
-              <Image
-                src="https://placehold.co/600x400.png"
-                alt="Sample Radar 1"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-xl"
-                data-ai-hint="data visualization"
-              />
-              <p className="mt-4 text-muted-foreground font-semibold">Frontend Technologies Radar</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <Image
-                src="https://placehold.co/600x400.png"
-                alt="Sample Radar 2"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-xl"
-                data-ai-hint="infographic chart"
-              />
-              <p className="mt-4 text-muted-foreground font-semibold">Cloud & DevOps Tools Radar</p>
+              <p className="mt-6 text-sm text-muted-foreground">
+                Already have Visual Studio Code? <Link href="#" className="text-primary-foreground underline">Open now</Link>
+              </p>
             </div>
           </div>
-        </section>
 
-        {/* Google Apps Integration Section */}
-        <section className="container py-20 md:py-24">
-            <Card className="bg-primary/5 border-primary/20 text-center p-8 md:p-12">
-                 <h2 className="text-3xl font-bold text-primary">Integrate with Google Workspace</h2>
-                 <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
-                    Seamlessly connect StaxMap with your Google account. Future updates will allow you to export radars to Google Slides, save data in Google Sheets, and more.
-                 </p>
-                 <div className="mt-6">
-                    <Button variant="secondary" disabled>Coming Soon</Button>
-                 </div>
-            </Card>
-        </section>
-
+          <div className="container relative -mt-16">
+            <div className="relative rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:p-4">
+                <div className="relative w-full h-auto rounded-lg shadow-2xl bg-[#1e1e1e] ring-1 ring-white/10">
+                    <div className="absolute -top-16 -right-16 z-20">
+                      <Image 
+                        src="https://placehold.co/150x150.png"
+                        alt="AI Agent Mascot"
+                        width={150}
+                        height={150}
+                        className="opacity-80"
+                        data-ai-hint="glowing robot mascot"
+                      />
+                    </div>
+                    <Image
+                      src="https://placehold.co/1200x650.png"
+                      alt="App screenshot"
+                      width={2432}
+                      height={1442}
+                      className="rounded-md opacity-80"
+                      data-ai-hint="dark code editor"
+                    />
+                    <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-lg"></div>
+                </div>
+            </div>
+          </div>
+          
+          <div
+            className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+            aria-hidden="true"
+          >
+            <div
+              className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#8085ff] to-[#4c00ff] opacity-40 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+              style={{
+                clipPath:
+                  'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
+              }}
+            />
+          </div>
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t">
+      <footer className="border-t border-white/10 mt-32">
         <div className="container flex items-center justify-between py-6">
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} StaxMap. All rights reserved.
