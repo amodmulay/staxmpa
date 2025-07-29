@@ -22,9 +22,10 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="flex-1">
+      {/* Main Content */}
+      <main className="flex-1 container max-w-7xl mx-auto px-4">
         {/* Hero Section */}
-        <section className="container text-center py-20 sm:py-32">
+        <section className="text-center py-20 sm:py-24">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter mb-4">
             Visualize Your Technology Landscape
           </h1>
@@ -38,8 +39,8 @@ export default function LandingPage() {
         </section>
 
         {/* Features Section */}
-        <section className="container py-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <section className="py-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard
               icon={<BarChart className="h-10 w-10 mb-4 text-primary" />}
               title="Dynamic Radar"
@@ -59,34 +60,31 @@ export default function LandingPage() {
         </section>
         
         {/* Sample Radars */}
-        <section className="py-20 bg-muted/20">
-            <div className="container">
-                <h2 className="text-3xl font-bold text-center mb-12">See It in Action</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="rounded-lg overflow-hidden border shadow-lg">
-                        <Image
-                            src="https://placehold.co/600x400.png"
-                            alt="Sample Radar 1"
-                            width={600}
-                            height={400}
-                            layout="responsive"
-                            data-ai-hint="technology radar dark"
-                        />
-                    </div>
-                     <div className="rounded-lg overflow-hidden border shadow-lg">
-                        <Image
-                            src="https://placehold.co/600x400.png"
-                            alt="Sample Radar 2"
-                            width={600}
-                            height={400}
-                            layout="responsive"
-                            data-ai-hint="technology radar light"
-                        />
-                    </div>
+        <section className="py-16">
+            <h2 className="text-3xl font-bold text-center mb-12">See It in Action</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="rounded-lg overflow-hidden border shadow-lg">
+                    <Image
+                        src="https://placehold.co/600x400.png"
+                        alt="Sample Radar 1"
+                        width={600}
+                        height={400}
+                        layout="responsive"
+                        data-ai-hint="technology radar dark"
+                    />
+                </div>
+                 <div className="rounded-lg overflow-hidden border shadow-lg">
+                    <Image
+                        src="https://placehold.co/600x400.png"
+                        alt="Sample Radar 2"
+                        width={600}
+                        height={400}
+                        layout="responsive"
+                        data-ai-hint="technology radar light"
+                    />
                 </div>
             </div>
         </section>
-
       </main>
 
       {/* Footer */}
@@ -103,7 +101,7 @@ export default function LandingPage() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <Card className="bg-background/50">
+    <Card className="bg-card/80">
       <CardHeader>
         {icon}
         <CardTitle>{title}</CardTitle>
