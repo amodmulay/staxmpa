@@ -59,32 +59,6 @@ export default function LandingPage() {
           </div>
         </section>
         
-        {/* Sample Radars */}
-        <section className="py-16">
-            <h2 className="text-3xl font-bold text-center mb-12">See It in Action</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="rounded-lg overflow-hidden border shadow-lg">
-                    <Image
-                        src="https://placehold.co/600x400.png"
-                        alt="Sample Radar 1"
-                        width={600}
-                        height={400}
-                        layout="responsive"
-                        data-ai-hint="technology radar dark"
-                    />
-                </div>
-                 <div className="rounded-lg overflow-hidden border shadow-lg">
-                    <Image
-                        src="https://placehold.co/600x400.png"
-                        alt="Sample Radar 2"
-                        width={600}
-                        height={400}
-                        layout="responsive"
-                        data-ai-hint="technology radar light"
-                    />
-                </div>
-            </div>
-        </section>
       </main>
 
       {/* Footer */}
