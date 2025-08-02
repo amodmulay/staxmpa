@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 import TopicList from '@/components/lexigen/TopicList';
+import { Slider } from '@/components/ui/slider';
 
 const initialRegionDefinitions: BaseRegion[] = [
   { id: 'today', name: 'Adopt' },
@@ -109,6 +110,7 @@ export default function RadarPage() {
   
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicPositions, setTopicPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [radarSize, setRadarSize] = useState(600);
 
   const radarRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -289,6 +291,17 @@ export default function RadarPage() {
             selectedThemeId={selectedThemeId} 
             onSelectTheme={handleThemeChange} 
           />
+          <div className="space-y-2">
+            <Label htmlFor="radar-size-slider">Radar Size: {radarSize}px</Label>
+            <Slider
+              id="radar-size-slider"
+              min={400}
+              max={1000}
+              step={20}
+              value={[radarSize]}
+              onValueChange={(value) => setRadarSize(value[0])}
+            />
+          </div>
           <Button onClick={handleScreenshot} className="w-full">
             <Download className="mr-2 h-4 w-4" />
             Capture Screenshot
@@ -349,8 +362,8 @@ export default function RadarPage() {
               topics={topics} 
               topicPositions={topicPositions}
               onTopicPositionChange={handleTopicPositionChange}
-              width={600} 
-              height={600}
+              width={radarSize} 
+              height={radarSize}
               topicDotColor={currentTheme.topicDotColor}
             />
           </CardContent>
