@@ -145,7 +145,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                     cy={centerY}
                     r={outerR}
                     fill={region.color}
-                    stroke="hsl(var(--border))"
+                    stroke="hsl(var(--foreground))"
                     strokeWidth="1"
                   />
                   <text
@@ -169,7 +169,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                 cy={centerY}
                 r={(i + 1) * bandThickness}
                 fill="none"
-                stroke="hsl(var(--border))"
+                stroke="hsl(var(--foreground))"
                 strokeWidth="0.5"
                 strokeDasharray="2,2"
                 />
@@ -185,7 +185,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                   y1={centerY}
                   x2={centerX + radarRadius * Math.cos(angleRad)}
                   y2={centerY + radarRadius * Math.sin(angleRad)}
-                  stroke="hsl(var(--border))"
+                  stroke="hsl(var(--foreground))"
                   strokeWidth="0.5"
                   strokeDasharray="2,2"
                 />
