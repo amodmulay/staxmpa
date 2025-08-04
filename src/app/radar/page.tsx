@@ -104,7 +104,7 @@ export default function RadarPage() {
   const { theme: systemTheme } = useTheme();
   const router = useRouter();
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
-  const [selectedThemeId, setSelectedThemeId] = useState<string>('default');
+  const [selectedThemeId, setSelectedThemeId] = useState<string>('monochrome');
   const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
   
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -114,6 +114,7 @@ export default function RadarPage() {
   const radarRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
+  const [hasSetInitialTheme, setHasSetInitialTheme] = useState(false);
 
   useEffect(() => {
     // Redirect if the user hasn't visited the landing page first
@@ -124,18 +125,18 @@ export default function RadarPage() {
     }
   }, [router]);
 
-  // Automatically switch radar theme based on light/dark mode, but only if the user hasn't made a manual selection.
+  // Suggest an initial theme based on system settings, but only once on mount.
   useEffect(() => {
-    if (mounted) {
-      if (selectedThemeId === 'sunset' || selectedThemeId === 'monochrome') return; // Don't override user's special selection
+    if (mounted && !hasSetInitialTheme) {
       if (systemTheme === 'dark') {
-        if (selectedThemeId !== 'materialDark') setSelectedThemeId('materialDark');
+        setSelectedThemeId('materialDark');
       } else {
-        if (selectedThemeId !== 'default') setSelectedThemeId('default');
+        setSelectedThemeId('default');
       }
       setCustomColorOverrides({});
+      setHasSetInitialTheme(true); // Ensure this only runs once
     }
-  }, [systemTheme, mounted, selectedThemeId]);
+  }, [systemTheme, mounted, hasSetInitialTheme]);
   
   const handleThemeChange = (themeId: string) => {
     setSelectedThemeId(themeId);
@@ -149,7 +150,7 @@ export default function RadarPage() {
   };
 
   const currentTheme = useMemo(() => {
-    return appThemes.find(t => t.id === selectedThemeId) || appThemes[0];
+    return appThemes.find(t => t.id === selectedThemeId) || appThemes.find(t => t.id === 'monochrome')!;
   }, [selectedThemeId]);
 
   const regions: Region[] = useMemo(() => {
