@@ -87,11 +87,17 @@ export default {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+        'word-cycle-up': {
+          '0%, 10%': { transform: 'translateY(100%)', opacity: '0' },
+          '15%, 85%': { transform: 'translateY(0)', opacity: '1' },
+          '90%, 100%': { transform: 'translateY(-100%)', opacity: '0' },
+        }
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+        'word-cycle': 'word-cycle-up 3s ease-in-out infinite',
   		}
   	}
   },

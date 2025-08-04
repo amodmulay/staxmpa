@@ -1,11 +1,32 @@
 
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Rocket, BarChart, Settings, GitBranch } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+const words = [
+  "Technology",
+  "Organisation",
+  "Product",
+  "Team",
+  "Strategy",
+  "Ecosystem"
+];
 
 export default function LandingPage() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, 2000); // Change word every 2 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -29,7 +50,22 @@ export default function LandingPage() {
           {/* Hero Section */}
           <section className="text-center py-20 sm:py-24">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter mb-4">
-              Visualize Your Technology Landscape
+              Visualize Your{" "}
+              <span className="inline-block relative h-[1.2em] overflow-hidden">
+                {words.map((word, i) => (
+                   <span
+                    key={word}
+                    className="transition-transform duration-500 ease-in-out absolute left-0"
+                    style={{
+                      transform: `translateY(${(i - index) * 100}%)`,
+                      opacity: i === index ? 1 : 0
+                    }}
+                   >
+                     {word}
+                   </span>
+                ))}
+              </span>{" "}
+              Landscape
             </h1>
             <p className="max-w-2xl mx-auto text-lg text-muted-foreground mb-8">
               StaxMap helps you create, manage, and share dynamic technology radars.
