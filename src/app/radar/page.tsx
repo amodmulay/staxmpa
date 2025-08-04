@@ -5,18 +5,12 @@ import type * as React from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
-import { TopicForm } from '@/components/lexigen/TopicForm';
-import { RadarView } from '@/components/lexigen/RadarView';
 import type { Region, Topic, ThemeDefinition, BaseRegion } from '@/types/lexigen';
-import { Download, Settings2, Palette } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { RadarView } from '@/components/lexigen/RadarView';
 import TopicList from '@/components/lexigen/TopicList';
-import { Slider } from '@/components/ui/slider';
+import { Sidebar } from '@/components/lexigen/Sidebar';
+import { RadarControls } from '@/components/lexigen/RadarControls';
 
 const initialRegionDefinitions: BaseRegion[] = [
   { id: 'today', name: 'Adopt' },
@@ -43,30 +37,12 @@ const generateDefaultColors: ThemeDefinition['generateColors'] = (baseRegions) =
 };
 
 const generateMaterialDarkColors: ThemeDefinition['generateColors'] = (baseRegions) => {
-  const HUE = 210;
-  const SAT = 10;
+  const HUE = 300; // Magenta from globals.css
+  const SAT = 100;
   return baseRegions.map((region, index) => ({
     ...region,
-    color: `hsla(${HUE}, ${SAT}%, ${20 + index * 6}%, 0.75)`, // Darker, slightly increasing lightness
-    textColor: `hsl(${HUE}, ${SAT}%, ${85 - index * 5}%)`, // Light text
-  }));
-};
-
-const generateMaterialLightIndigoColors: ThemeDefinition['generateColors'] = (baseRegions) => {
-  const HUE = 230; // Indigo-ish
-  const SAT = 55;
-  return baseRegions.map((region, index) => ({
-    ...region,
-    color: `hsla(${HUE}, ${SAT}%, ${96 - index * 8}%, 0.65)`, // Light to darker indigo shades
-    textColor: `hsl(${HUE}, ${SAT-25}%, ${25 + index * 6}%)`, // Darker text, good contrast
-  }));
-};
-
-const generateMonochromeColors: ThemeDefinition['generateColors'] = (baseRegions) => {
-  return baseRegions.map((region, index) => ({
-    ...region,
-    color: `hsla(0, 0%, ${90 - index * 12}%, 0.7)`, // Shades of gray from light to dark
-    textColor: `hsl(0, 0%, ${15 + index * 5}%)`, // Dark text, ensuring readability
+    color: `hsla(${HUE}, ${SAT}%, ${20 + index * 8}%, 0.75)`, // Darker, slightly increasing lightness
+    textColor: `hsl(${HUE}, ${SAT-20}%, ${85 - index * 5}%)`, // Light text
   }));
 };
 
@@ -75,29 +51,15 @@ const appThemes: ThemeDefinition[] = [
     id: 'default',
     name: 'Default Teal',
     generateColors: generateDefaultColors,
-    topicDotColor: 'hsl(var(--primary))', // Uses CSS variable for dots
+    topicDotColor: 'hsl(var(--primary))',
     screenshotBackgroundColor: 'hsl(var(--background))',
   },
   {
     id: 'materialDark',
     name: 'Material Dark',
     generateColors: generateMaterialDarkColors,
-    topicDotColor: '#BB86FC', // Material Purple A200
-    screenshotBackgroundColor: 'hsl(220,15%,10%)', // Matches dark theme background
-  },
-  {
-    id: 'materialLightIndigo',
-    name: 'Material Light (Indigo)',
-    generateColors: generateMaterialLightIndigoColors,
-    topicDotColor: '#3F51B5', // Material Indigo 500
-    screenshotBackgroundColor: 'hsl(0,0%,100%)',
-  },
-  {
-    id: 'monochrome',
-    name: 'Monochrome',
-    generateColors: generateMonochromeColors,
-    topicDotColor: '#212121', // Dark Gray
-    screenshotBackgroundColor: 'hsl(0,0%,100%)',
+    topicDotColor: 'hsl(var(--primary))',
+    screenshotBackgroundColor: 'hsl(var(--background))',
   },
 ];
 
@@ -182,19 +144,14 @@ export default function RadarPage() {
         const canvasOptions: Partial<html2canvas.Options> = { 
           useCORS: true,
           scale: 2, 
+          backgroundColor: currentTheme.screenshotBackgroundColor || null,
         };
-        if (currentTheme.screenshotBackgroundColor && currentTheme.id !== 'default') { 
-          canvasOptions.backgroundColor = currentTheme.screenshotBackgroundColor;
-        } else if (currentTheme.id === 'default') {
-            const radarStyle = window.getComputedStyle(radarRef.current);
-            canvasOptions.backgroundColor = radarStyle.backgroundColor || '#E3F2FD';
-        }
-
+        
         const canvas = await html2canvas(radarRef.current, canvasOptions);
         const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = image;
-        link.download = 'lexigen-radar.png';
+        link.download = 'staxmap-radar.png';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -269,6 +226,20 @@ export default function RadarPage() {
       duration: 2000,
     });
   };
+  
+  const radarControls = (
+    <RadarControls
+        regions={regions}
+        onAddTopic={handleAddTopic}
+        radarSize={radarSize}
+        onRadarSizeChange={setRadarSize}
+        onScreenshot={handleScreenshot}
+        onRegionConfigChange={handleRegionConfigChange}
+        onRemoveRegion={handleRemoveRegion}
+        onAddRegion={handleAddRegion}
+        baseRegionDefinitions={baseRegionDefinitions}
+      />
+  );
 
   if (!mounted) {
     return (
@@ -279,83 +250,9 @@ export default function RadarPage() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="grid grid-cols-1 gap-6">
-      <TopicForm regions={regions} onAddTopic={handleAddTopic} />
-        
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center text-xl">
-            <Settings2 className="mr-2 h-6 w-6 text-primary" />
-            Radar Configuration
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="radar-size-slider">Radar Size: {radarSize}px</Label>
-            <Slider
-              id="radar-size-slider"
-              min={400}
-              max={1000}
-              step={20}
-              value={[radarSize]}
-              onValueChange={(value) => setRadarSize(value[0])}
-            />
-          </div>
-          <Button onClick={handleScreenshot} className="w-full">
-            <Download className="mr-2 h-4 w-4" />
-            Capture Screenshot
-          </Button>
-          <ScrollArea className="h-[300px] pr-3">
-            <div className="space-y-3">
-            {regions.map((region, index) => (
-              <Card key={region.id} className="p-3 bg-muted/50">
-                <Label htmlFor={`region-name-${index}`} className="text-sm font-medium">Region {index + 1}: {region.name}</Label>
-                <Input
-                  id={`region-name-${index}`}
-                  type="text"
-                  value={region.name}
-                  onChange={(e) => handleRegionConfigChange(index, 'name', e.target.value)}
-                  className="mt-1 mb-2"
-                />
-                <div className="flex items-center space-x-2">
-                  <Label htmlFor={`region-color-${index}`} className="text-xs">Band Color:</Label>
-                  <Input
-                    id={`region-color-${index}`}
-                    type="color"
-                    value={region.color.startsWith('hsl') ? hslToHex(region.color) : region.color}
-                    onChange={(e) => handleRegionConfigChange(index, 'color', e.target.value)}
-                    className="w-16 h-8 p-1"
-                  />
-                    <Label htmlFor={`region-text-color-${index}`} className="text-xs">Text Color:</Label>
-                  <Input
-                    id={`region-text-color-${index}`}
-                    type="color"
-                    value={region.textColor.startsWith('hsl') ? hslToHex(region.textColor) : region.textColor}
-                    onChange={(e) => handleRegionConfigChange(index, 'textColor', e.target.value)}
-                      className="w-16 h-8 p-1"
-                  />
-                  <Button variant="destructive" size="sm" onClick={() => handleRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>&times;</Button>
-                </div>
-              </Card>
-            ))}
-            </div>
-          </ScrollArea>
-            <Button onClick={handleAddRegion} variant="outline" className="w-full">
-            <Palette className="mr-2 h-4 w-4" /> Add Region
-          </Button>
-        </CardContent>
-      </Card>
-
-      </div>
-
-      <div className="lg:col-span-2 flex flex-col gap-6">
-        <div className="flex items-center justify-center flex-grow">
-        <Card className="shadow-xl w-full overflow-hidden flex-grow">
-          <CardHeader>
-            <CardTitle className="text-xl text-center">Radar View</CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-center items-center p-2 md:p-4">
+    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px] lg:grid-cols-[minmax(0,1fr)_400px] gap-6 h-full">
+      <div className="flex flex-col gap-6">
+        <div className="flex-grow flex items-center justify-center rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6">
             <RadarView 
               ref={radarRef} 
               regions={regions} 
@@ -366,42 +263,15 @@ export default function RadarPage() {
               height={radarSize}
               topicDotColor={currentTheme.topicDotColor}
             />
-          </CardContent>
-        </Card>
-      </div>
-
+        </div>
         <TopicList topics={topics} onRemoveTopic={handleRemoveTopic} regions={regions} />
+      </div>
+      
+      <div className="hidden md:block">
+        <Sidebar>
+          {radarControls}
+        </Sidebar>
+      </div>
     </div>
-  </div>
   );
 }
-
-function hslToHex(hslStr: string): string {
-  const match = hslStr.match(/hsla?\((\d+),\s*([\d.]+)%,\s*([\d.]+)%(?:,\s*([\d.]+))?\)/);
-  if (!match) return '#000000'; 
-
-  let h = parseInt(match[1]);
-  let s = parseInt(match[2]) / 100;
-  let l = parseInt(match[3]) / 100;
-
-  let c = (1 - Math.abs(2 * l - 1)) * s;
-  let x = c * (1 - Math.abs((h / 60) % 2 - 1));
-  let m = l - c / 2;
-  let r = 0, g = 0, b = 0;
-
-  if (0 <= h && h < 60) { r = c; g = x; b = 0; }
-  else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
-  else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
-  else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
-  else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
-  else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
-  
-  r = Math.round((r + m) * 255);
-  g = Math.round((g + m) * 255);
-  b = Math.round((b + m) * 255);
-
-  const toHex = (val: number) => val.toString(16).padStart(2, '0');
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-    

@@ -52,7 +52,7 @@ export function TopicForm({ regions, onAddTopic }: TopicFormProps) {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg border-none">
       <CardHeader>
         <CardTitle className="flex items-center text-xl">
           <PlusCircle className="mr-2 h-6 w-6 text-primary" />
