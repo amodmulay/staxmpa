@@ -4,6 +4,7 @@
 import type * as React from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import html2canvas from 'html2canvas';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { TopicForm } from '@/components/lexigen/TopicForm';
 import { RadarView } from '@/components/lexigen/RadarView';
@@ -14,7 +15,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 import TopicList from '@/components/lexigen/TopicList';
 import { Slider } from '@/components/ui/slider';
 
@@ -104,6 +104,7 @@ const appThemes: ThemeDefinition[] = [
 // --- END THEME DEFINITIONS ---
 
 export default function RadarPage() {
+  const { theme: systemTheme } = useTheme();
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
   const [selectedThemeId, setSelectedThemeId] = useState<string>(appThemes[0].id);
   const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
@@ -119,6 +120,16 @@ export default function RadarPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Automatically switch radar theme based on light/dark mode
+  useEffect(() => {
+    if (systemTheme === 'dark') {
+      setSelectedThemeId('materialDark');
+    } else {
+      setSelectedThemeId('default');
+    }
+    setCustomColorOverrides({});
+  }, [systemTheme]);
 
   const currentTheme = useMemo(() => {
     return appThemes.find(t => t.id === selectedThemeId) || appThemes[0];
@@ -201,12 +212,6 @@ export default function RadarPage() {
       }
     }
   };
-  
-  const handleThemeChange = (themeId: string) => {
-    setSelectedThemeId(themeId);
-    setCustomColorOverrides({}); 
-    toast({ title: "Theme Changed", description: `Switched to ${appThemes.find(t=>t.id===themeId)?.name || 'selected'} theme.`});
-  };
 
   const handleRegionConfigChange = (index: number, field: 'name' | 'color' | 'textColor', value: string) => {
     const regionIdToUpdate = baseRegionDefinitions[index]?.id;
@@ -286,11 +291,6 @@ export default function RadarPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ThemeSelector 
-            themes={appThemes} 
-            selectedThemeId={selectedThemeId} 
-            onSelectTheme={handleThemeChange} 
-          />
           <div className="space-y-2">
             <Label htmlFor="radar-size-slider">Radar Size: {radarSize}px</Label>
             <Slider
@@ -306,7 +306,7 @@ export default function RadarPage() {
             <Download className="mr-2 h-4 w-4" />
             Capture Screenshot
           </Button>
-          <ScrollArea className="h-[250px] pr-3">
+          <ScrollArea className="h-[300px] pr-3">
             <div className="space-y-3">
             {regions.map((region, index) => (
               <Card key={region.id} className="p-3 bg-muted/50">
@@ -403,3 +403,5 @@ function hslToHex(hslStr: string): string {
   const toHex = (val: number) => val.toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+
+    
