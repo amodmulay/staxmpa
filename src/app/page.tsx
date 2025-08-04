@@ -50,6 +50,11 @@ export default function LandingPage() {
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
 
   useEffect(() => {
+    // Set a flag in session storage to indicate the user has visited the landing page
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('hasVisitedLanding', 'true');
+    }
+
     const interval = setInterval(() => {
       setCurrentPhraseIndex((prevIndex) => (prevIndex + 1) % rotatingPhrases.length);
     }, 3000); // Change phrase every 3 seconds

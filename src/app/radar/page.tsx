@@ -3,6 +3,7 @@
 
 import type * as React from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import html2canvas from 'html2canvas';
 import { useTheme } from 'next-themes';
 import type { Region, Topic, ThemeDefinition, BaseRegion } from '@/types/lexigen';
@@ -101,6 +102,7 @@ const appThemes: ThemeDefinition[] = [
 
 export default function RadarPage() {
   const { theme: systemTheme } = useTheme();
+  const router = useRouter();
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
   const [selectedThemeId, setSelectedThemeId] = useState<string>('default');
   const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
@@ -114,8 +116,13 @@ export default function RadarPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    // Redirect if the user hasn't visited the landing page first
+    if (typeof window !== 'undefined' && sessionStorage.getItem('hasVisitedLanding') !== 'true') {
+      router.push('/');
+    } else {
+      setMounted(true);
+    }
+  }, [router]);
 
   // Automatically switch radar theme based on light/dark mode, but only if the user hasn't made a manual selection.
   useEffect(() => {
