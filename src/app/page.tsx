@@ -65,7 +65,7 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto">
               <BrainCircuit className="h-16 w-16 text-primary mx-auto mb-6" />
-              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 Visualize Your{' '}
                 <span className="relative inline-block h-[1.2em] overflow-hidden align-bottom">
                   <span className="opacity-0">{words[0]}</span>
@@ -76,7 +76,7 @@ export default function LandingPage() {
                     {words[currentWordIndex]}
                   </span>
                 </span>
-                <br />
+                {' '}
                  Landscape
               </h1>
               <p className="mt-6 text-lg text-muted-foreground md:text-xl">
@@ -84,7 +84,7 @@ export default function LandingPage() {
               </p>
               <div className="mt-8">
                 <Button asChild size="lg">
-                  <Link href="/loading">
+                  <Link href="/radar">
                     Get Started <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
