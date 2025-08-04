@@ -1,13 +1,12 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, BrainCircuit, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LandingHeader } from '@/components/lexigen/LandingHeader';
-
-const words = ["Technology", "Strategy", "Organisation", "Product", "Ecosystem"];
 
 const features = [
   {
@@ -44,18 +43,6 @@ const features = [
 
 
 export default function LandingPage() {
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [animationKey, setAnimationKey] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
-      setAnimationKey(prevKey => prevKey + 1);
-    }, 2500); // Change word every 2.5 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="flex flex-col min-h-screen">
       <LandingHeader />
@@ -63,36 +50,44 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="w-full py-24 md:py-32 lg:py-40 text-center">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-3xl mx-auto flex flex-col items-center gap-6">
-              <BrainCircuit className="h-16 w-8 text-primary" />
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl flex items-center justify-center space-x-3">
-                <span>Visualize Your</span>
-                <span className="inline-flex overflow-hidden h-[1.2em]">
-                  <span
-                    key={animationKey}
-                    className="animate-word-cycle"
-                  >
-                    {words[currentWordIndex]}
-                  </span>
-                </span>
-                <span>Landscape</span>
+            <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl text-gradient">
+                Visualize Your Technology Landscape
               </h1>
               <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
                 StaxMap helps you create, manage, and share interactive technology radars. Map your tools, platforms, and frameworks with clarity and confidence.
               </p>
-              <div className="mt-2">
+              <div className="mt-4">
                 <Button asChild size="lg">
                   <Link href="/radar">
                     Get Started <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               </div>
+
+              <div className="mt-16 glow-container">
+                <div className="relative rounded-xl border bg-card/50 shadow-lg p-2">
+                    <Image
+                        src="https://placehold.co/1200x680.png"
+                        alt="StaxMap Application Preview"
+                        width={1200}
+                        height={680}
+                        className="rounded-lg"
+                        data-ai-hint="technology radar ui"
+                    />
+                    <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2">
+                      <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                      <div className="h-3 w-3 rounded-full bg-yellow-400"></div>
+                      <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                    </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section className="w-full py-20 md:py-28 bg-muted/50">
+        <section id="features" className="w-full py-20 md:py-28 bg-muted/50">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Packed with Powerful Features</h2>
@@ -100,9 +95,11 @@ export default function LandingPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
               {features.map((feature, index) => (
-                <div key={index} className="flex flex-col items-start p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-                  {feature.icon}
-                  <h3 className="text-xl font-semibold mt-4">{feature.title}</h3>
+                <div key={index} className="flex flex-col items-start p-6 bg-card rounded-lg border shadow-sm hover:border-primary/50 hover:shadow-lg transition-all">
+                  <div className="bg-primary/10 p-3 rounded-full mb-4 border border-primary/20">
+                    {React.cloneElement(feature.icon, { className: 'h-6 w-6 text-primary'})}
+                  </div>
+                  <h3 className="text-xl font-semibold mt-2">{feature.title}</h3>
                   <p className="mt-2 text-muted-foreground">{feature.description}</p>
                 </div>
               ))}
