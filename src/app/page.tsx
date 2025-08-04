@@ -101,10 +101,10 @@ export default function LandingPage() {
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Packed with Powerful Features</h2>
               <p className="mt-4 text-lg text-muted-foreground">Everything you need to build a clear and actionable technology radar for your team.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 [perspective:1000px]">
               {features.map((feature, index) => (
-                <div key={index} className="glow-container">
-                  <div className="flex flex-col items-start p-6 bg-card rounded-lg border shadow-sm h-full">
+                <div key={index} className="glow-container group">
+                  <div className="flex flex-col items-start p-6 bg-card rounded-lg border shadow-sm h-full transition-transform duration-300 ease-in-out group-hover:rotate-y-2">
                     <div className="bg-primary/10 p-3 rounded-full mb-4 border border-primary/20">
                       {React.cloneElement(feature.icon, { className: 'h-6 w-6 text-primary'})}
                     </div>

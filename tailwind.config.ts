@@ -1,6 +1,25 @@
 
 import type { Config } from "tailwindcss";
 import defaultTheme from 'tailwindcss/defaultTheme';
+const plugin = require('tailwindcss/plugin')
+
+const customTransforms = plugin(function({ addUtilities }: { addUtilities: any }) {
+  addUtilities({
+    '.rotate-y-2': {
+      transform: 'rotateY(2deg)',
+    },
+    '.rotate-y-4': {
+      transform: 'rotateY(4deg)',
+    },
+    '.rotate-y-n2': {
+      transform: 'rotateY(-2deg)',
+    },
+    '.rotate-y-n4': {
+      transform: 'rotateY(-4deg)',
+    }
+  })
+});
+
 
 export default {
     darkMode: ["class"],
@@ -101,5 +120,5 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), customTransforms],
 } satisfies Config;
