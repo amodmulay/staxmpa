@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -40,9 +41,9 @@ const features = [
 ];
 
 const rotatingPhrases = [
-  'Define your tech strategy.',
-  'Define your organization strategy.',
-  'Visualize your technology adoption roadmap.',
+  'Define your tech strategy',
+  'Define your organization strategy',
+  'Visualize your technology adoption roadmap',
 ];
 
 export default function LandingPage() {
@@ -77,13 +78,17 @@ export default function LandingPage() {
                   </Link>
                 </Button>
               </div>
-              <div className="mt-6 h-8 text-center">
-                <span
-                  key={currentPhraseIndex}
-                  className="text-muted-foreground text-lg animate-in fade-in duration-500"
+              <div className="mt-6 h-10 text-center font-semibold text-xl md:text-2xl overflow-hidden">
+                <div
+                  className="transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateY(-${currentPhraseIndex * 2.5}rem)`}}
                 >
-                  {rotatingPhrases[currentPhraseIndex]}
-                </span>
+                  {rotatingPhrases.map((phrase, index) => (
+                    <div key={index} className="h-10 flex items-center justify-center">
+                      <span className="text-gradient">{phrase}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
