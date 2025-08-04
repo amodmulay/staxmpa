@@ -11,6 +11,7 @@ import { RadarView } from '@/components/lexigen/RadarView';
 import TopicList from '@/components/lexigen/TopicList';
 import { Sidebar } from '@/components/lexigen/Sidebar';
 import { RadarControls } from '@/components/lexigen/RadarControls';
+import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 
 const initialRegionDefinitions: BaseRegion[] = [
   { id: 'today', name: 'Adopt' },
@@ -22,29 +23,48 @@ const initialRegionDefinitions: BaseRegion[] = [
 // --- THEME DEFINITIONS ---
 
 const generateDefaultColors: ThemeDefinition['generateColors'] = (baseRegions) => {
-  const baseHue = 207; // Base hue for blue
-  const saturation = 70;
-  const baseLightness = 92;
-  const lightnessStep = -5;
+  const baseHue = 175; // Teal
+  const saturation = 55;
+  const baseLightness = 94;
+  const lightnessStep = -6;
   const textBaseLightness = 30;
   const textLightnessStep = 5;
 
   return baseRegions.map((region, index) => ({
     ...region,
-    color: `hsla(${baseHue}, ${saturation}%, ${baseLightness + index * lightnessStep}%, 0.6)`,
-    textColor: `hsl(${baseHue - 10}, ${saturation-50}%, ${textBaseLightness + index * textLightnessStep}%)`,
+    color: `hsla(${baseHue}, ${saturation}%, ${baseLightness + index * lightnessStep}%, 0.7)`,
+    textColor: `hsl(${baseHue - 10}, ${saturation - 30}%, ${textBaseLightness + index * textLightnessStep}%)`,
   }));
 };
 
 const generateMaterialDarkColors: ThemeDefinition['generateColors'] = (baseRegions) => {
-  const HUE = 221; // Blue from globals.css
-  const SAT = 100;
+  const HUE = 221; // Blue
+  const SAT = 83;
   return baseRegions.map((region, index) => ({
     ...region,
-    color: `hsla(${HUE}, ${SAT}%, ${20 + index * 8}%, 0.75)`, // Darker, slightly increasing lightness
-    textColor: `hsl(${HUE}, ${SAT-20}%, ${85 - index * 5}%)`, // Light text
+    color: `hsla(${HUE}, ${SAT}%, ${15 + index * 6}%, 0.8)`, // Darker, slightly increasing lightness
+    textColor: `hsl(${HUE}, ${SAT - 30}%, ${88 - index * 5}%)`, // Light text
   }));
 };
+
+const generateSunsetColors: ThemeDefinition['generateColors'] = (baseRegions) => {
+    const colors = ['#4c1d95', '#be185d', '#f97316', '#facc15']; // Purple, Pink, Orange, Yellow
+    const textColors = ['#f5d0fe', '#fbcfe8', '#ffedd5', '#fef9c3'];
+    return baseRegions.map((region, index) => ({
+      ...region,
+      color: colors[index % colors.length],
+      textColor: textColors[index % textColors.length],
+    }));
+};
+
+const generateMonochromeColors: ThemeDefinition['generateColors'] = (baseRegions) => {
+  return baseRegions.map((region, index) => ({
+      ...region,
+      color: `hsl(0, 0%, ${95 - index * 10}%)`,
+      textColor: `hsl(0, 0%, ${20 + index * 10}%)`,
+  }));
+};
+
 
 const appThemes: ThemeDefinition[] = [
   {
@@ -61,6 +81,20 @@ const appThemes: ThemeDefinition[] = [
     topicDotColor: 'hsl(var(--primary))',
     screenshotBackgroundColor: 'hsl(var(--background))',
   },
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    generateColors: generateSunsetColors,
+    topicDotColor: '#ffffff',
+    screenshotBackgroundColor: '#1c1917',
+  },
+  {
+    id: 'monochrome',
+    name: 'Monochrome',
+    generateColors: generateMonochromeColors,
+    topicDotColor: 'hsl(var(--primary))',
+    screenshotBackgroundColor: 'hsl(var(--background))',
+  }
 ];
 
 // --- END THEME DEFINITIONS ---
@@ -83,15 +117,30 @@ export default function RadarPage() {
     setMounted(true);
   }, []);
 
-  // Automatically switch radar theme based on light/dark mode
+  // Automatically switch radar theme based on light/dark mode, but only if the user hasn't made a manual selection.
   useEffect(() => {
-    if (systemTheme === 'dark') {
-      setSelectedThemeId('materialDark');
-    } else {
-      setSelectedThemeId('default');
+    // This effect now ONLY sets the initial theme based on the system theme.
+    // Manual changes via `handleThemeChange` will override this.
+    if (mounted) {
+      if (systemTheme === 'dark') {
+        setSelectedThemeId('materialDark');
+      } else {
+        setSelectedThemeId('default');
+      }
+      setCustomColorOverrides({});
     }
+  }, [systemTheme, mounted]);
+  
+  const handleThemeChange = (themeId: string) => {
+    setSelectedThemeId(themeId);
+    // Reset custom color overrides when changing themes
     setCustomColorOverrides({});
-  }, [systemTheme]);
+    toast({
+        title: "Theme Changed",
+        description: `Switched to the ${appThemes.find(t => t.id === themeId)?.name || ''} theme.`,
+        duration: 2000,
+    });
+  };
 
   const currentTheme = useMemo(() => {
     return appThemes.find(t => t.id === selectedThemeId) || appThemes[0];
@@ -115,10 +164,6 @@ export default function RadarPage() {
       magnitude: 0.3 + Math.random() * 0.4,
     };
     setTopics((prevTopics) => [...prevTopics, newTopic]);
-    toast({
-      title: "Topic Added",
-      description: `"${name}" has been added to the radar.`,
-    });
   };
 
   const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, newRegionId?: string) => {
@@ -238,7 +283,13 @@ export default function RadarPage() {
         onRemoveRegion={handleRemoveRegion}
         onAddRegion={handleAddRegion}
         baseRegionDefinitions={baseRegionDefinitions}
-      />
+      >
+        <ThemeSelector
+            themes={appThemes}
+            selectedThemeId={selectedThemeId}
+            onSelectTheme={handleThemeChange}
+        />
+    </RadarControls>
   );
 
   if (!mounted) {

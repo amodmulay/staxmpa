@@ -16,9 +16,9 @@ interface ThemeSelectorProps {
 export function ThemeSelector({ themes, selectedThemeId, onSelectTheme }: ThemeSelectorProps) {
   return (
     <div className="space-y-2">
-      <Label className="flex items-center text-sm font-medium">
-        <Paintbrush className="mr-2 h-4 w-4" />
-        Select Theme
+      <Label className="flex items-center text-md font-medium">
+        <Paintbrush className="mr-2 h-4 w-4 text-primary" />
+        Radar Theme
       </Label>
       <div className="grid grid-cols-2 gap-2">
         {themes.map((theme) => (

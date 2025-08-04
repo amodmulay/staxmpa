@@ -7,11 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { BaseRegion, Region } from '@/types/lexigen';
 import { Download, Palette, PlusCircle, Settings2 } from 'lucide-react';
 import { hslToHex } from '@/lib/utils';
+import React from 'react';
 
 
 interface RadarControlsProps {
@@ -24,6 +26,7 @@ interface RadarControlsProps {
   onRegionConfigChange: (index: number, field: 'name' | 'color' | 'textColor', value: string) => void;
   onRemoveRegion: (id: string) => void;
   onAddRegion: () => void;
+  children?: React.ReactNode; // For theme selector
 }
 
 export function RadarControls({
@@ -36,6 +39,7 @@ export function RadarControls({
   onRegionConfigChange,
   onRemoveRegion,
   onAddRegion,
+  children,
 }: RadarControlsProps) {
 
   return (
@@ -62,6 +66,13 @@ export function RadarControls({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {children && (
+              <>
+                {children}
+                <Separator />
+              </>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="radar-size-slider">Radar Size: {radarSize}px</Label>
               <Slider
@@ -77,8 +88,11 @@ export function RadarControls({
               <Download className="mr-2 h-4 w-4" />
               Capture Screenshot
             </Button>
+            
+            <Separator />
+
             <Label className="text-md font-medium">Regions</Label>
-            <ScrollArea className="h-[300px] pr-3">
+            <ScrollArea className="h-[250px] pr-3">
               <div className="space-y-3">
               {regions.map((region, index) => (
                 <Card key={region.id} className="p-3 bg-muted/50">
