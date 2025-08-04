@@ -37,7 +37,7 @@ const generateDefaultColors: ThemeDefinition['generateColors'] = (baseRegions) =
 };
 
 const generateMaterialDarkColors: ThemeDefinition['generateColors'] = (baseRegions) => {
-  const HUE = 300; // Magenta from globals.css
+  const HUE = 221; // Blue from globals.css
   const SAT = 100;
   return baseRegions.map((region, index) => ({
     ...region,
