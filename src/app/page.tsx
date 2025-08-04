@@ -65,19 +65,17 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto flex flex-col items-center gap-6">
               <BrainCircuit className="h-16 w-8 text-primary" />
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-                Visualize Your{' '}
-                <span className="relative inline-block h-[1.2em] overflow-hidden align-bottom">
-                  <span className="opacity-0">{words[0]}</span>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl flex items-center justify-center space-x-3">
+                <span>Visualize Your</span>
+                <span className="inline-flex overflow-hidden h-[1.2em]">
                   <span
                     key={animationKey}
-                    className="animate-word-cycle absolute left-0 top-0"
+                    className="animate-word-cycle"
                   >
                     {words[currentWordIndex]}
                   </span>
                 </span>
-                {' '}
-                 Landscape
+                <span>Landscape</span>
               </h1>
               <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
                 StaxMap helps you create, manage, and share interactive technology radars. Map your tools, platforms, and frameworks with clarity and confidence.
