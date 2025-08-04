@@ -128,15 +128,14 @@ export default function RadarPage() {
   // Suggest an initial theme based on system settings, but only once on mount.
   useEffect(() => {
     if (mounted && !hasSetInitialTheme) {
-      if (systemTheme === 'dark') {
+      if (systemTheme === 'dark' && selectedThemeId !== 'materialDark') {
         setSelectedThemeId('materialDark');
-      } else {
+      } else if (systemTheme === 'light' && selectedThemeId !== 'default') {
         setSelectedThemeId('default');
       }
-      setCustomColorOverrides({});
       setHasSetInitialTheme(true); // Ensure this only runs once
     }
-  }, [systemTheme, mounted, hasSetInitialTheme]);
+  }, [systemTheme, mounted, hasSetInitialTheme, selectedThemeId]);
   
   const handleThemeChange = (themeId: string) => {
     setSelectedThemeId(themeId);
