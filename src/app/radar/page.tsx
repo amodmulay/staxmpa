@@ -68,6 +68,13 @@ const generateMonochromeColors: ThemeDefinition['generateColors'] = (baseRegions
 
 const appThemes: ThemeDefinition[] = [
   {
+    id: 'monochrome',
+    name: 'Monochrome',
+    generateColors: generateMonochromeColors,
+    topicDotColor: 'hsl(var(--primary))',
+    screenshotBackgroundColor: 'hsl(var(--background))',
+  },
+  {
     id: 'default',
     name: 'Default Teal',
     generateColors: generateDefaultColors,
@@ -87,13 +94,6 @@ const appThemes: ThemeDefinition[] = [
     generateColors: generateSunsetColors,
     topicDotColor: '#ffffff',
     screenshotBackgroundColor: '#1c1917',
-  },
-  {
-    id: 'monochrome',
-    name: 'Monochrome',
-    generateColors: generateMonochromeColors,
-    topicDotColor: 'hsl(var(--primary))',
-    screenshotBackgroundColor: 'hsl(var(--background))',
   }
 ];
 
@@ -102,7 +102,7 @@ const appThemes: ThemeDefinition[] = [
 export default function RadarPage() {
   const { theme: systemTheme } = useTheme();
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
-  const [selectedThemeId, setSelectedThemeId] = useState<string>('sunset');
+  const [selectedThemeId, setSelectedThemeId] = useState<string>('monochrome');
   const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
   
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -119,7 +119,8 @@ export default function RadarPage() {
 
   // Automatically switch radar theme based on light/dark mode, but only if the user hasn't made a manual selection.
   useEffect(() => {
-    if (mounted && selectedThemeId !== 'sunset') { // Only run if not already on the desired default
+    if (mounted) {
+      if (selectedThemeId === 'sunset' || selectedThemeId === 'monochrome') return; // Don't override user's special selection
       if (systemTheme === 'dark') {
         setSelectedThemeId('materialDark');
       } else {
@@ -127,7 +128,7 @@ export default function RadarPage() {
       }
       setCustomColorOverrides({});
     }
-  }, [systemTheme, mounted]);
+  }, [systemTheme, mounted, selectedThemeId]);
   
   const handleThemeChange = (themeId: string) => {
     setSelectedThemeId(themeId);
