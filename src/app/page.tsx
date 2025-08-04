@@ -57,7 +57,7 @@ export default function LandingPage() {
               <div className="mt-4">
                 <Button asChild size="lg">
                   <Link href="/radar">
-                    Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                    Launch Radar <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               </div>
