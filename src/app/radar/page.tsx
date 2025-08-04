@@ -114,7 +114,6 @@ export default function RadarPage() {
   const radarRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
-  const [hasSetInitialTheme, setHasSetInitialTheme] = useState(false);
 
   useEffect(() => {
     // Redirect if the user hasn't visited the landing page first
@@ -124,18 +123,6 @@ export default function RadarPage() {
       setMounted(true);
     }
   }, [router]);
-
-  // Suggest an initial theme based on system settings, but only once on mount.
-  useEffect(() => {
-    if (mounted && !hasSetInitialTheme) {
-      if (systemTheme === 'dark' && selectedThemeId !== 'materialDark') {
-        setSelectedThemeId('materialDark');
-      } else if (systemTheme === 'light' && selectedThemeId !== 'default') {
-        setSelectedThemeId('default');
-      }
-      setHasSetInitialTheme(true); // Ensure this only runs once
-    }
-  }, [systemTheme, mounted, hasSetInitialTheme, selectedThemeId]);
   
   const handleThemeChange = (themeId: string) => {
     setSelectedThemeId(themeId);
