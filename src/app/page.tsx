@@ -51,19 +51,13 @@ export default function LandingPage() {
           <section className="text-center py-20 sm:py-24">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter mb-4">
               Visualize Your{" "}
-              <span className="inline-block relative h-[1.2em] overflow-hidden">
-                {words.map((word, i) => (
-                   <span
-                    key={word}
-                    className="transition-transform duration-500 ease-in-out absolute left-0"
-                    style={{
-                      transform: `translateY(${(i - index) * 100}%)`,
-                      opacity: i === index ? 1 : 0
-                    }}
-                   >
-                     {word}
-                   </span>
-                ))}
+              <span className="inline-block relative text-primary h-[1.2em] overflow-hidden">
+                <span
+                  key={words[index]}
+                  className="animate-word-cycle absolute left-0 bottom-0"
+                 >
+                   {words[index]}
+                </span>
               </span>{" "}
               Landscape
             </h1>
