@@ -41,9 +41,9 @@ const features = [
 ];
 
 const rotatingPhrases = [
-  'Define your tech strategy',
-  'Define your organization strategy',
-  'Visualize your technology adoption roadmap',
+  'Map Your Technology\'s Future',
+  'Align Teams with Strategic Clarity',
+  'Drive Innovation, One Decision at a Time',
 ];
 
 export default function LandingPage() {
