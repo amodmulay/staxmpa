@@ -41,7 +41,7 @@ const features = [
 ];
 
 const rotatingPhrases = [
-  'Map Your Technology\'s Future',
+  'Create your technology strategy',
   'Align Teams with Strategic Clarity',
   'Drive Innovation, One Decision at a Time',
 ];
