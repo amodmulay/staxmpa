@@ -102,7 +102,7 @@ const appThemes: ThemeDefinition[] = [
 export default function RadarPage() {
   const { theme: systemTheme } = useTheme();
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
-  const [selectedThemeId, setSelectedThemeId] = useState<string>(appThemes[0].id);
+  const [selectedThemeId, setSelectedThemeId] = useState<string>('sunset');
   const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
   
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -119,9 +119,7 @@ export default function RadarPage() {
 
   // Automatically switch radar theme based on light/dark mode, but only if the user hasn't made a manual selection.
   useEffect(() => {
-    // This effect now ONLY sets the initial theme based on the system theme.
-    // Manual changes via `handleThemeChange` will override this.
-    if (mounted) {
+    if (mounted && selectedThemeId !== 'sunset') { // Only run if not already on the desired default
       if (systemTheme === 'dark') {
         setSelectedThemeId('materialDark');
       } else {
