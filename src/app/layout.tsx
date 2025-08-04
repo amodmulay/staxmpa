@@ -25,11 +25,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <footer className="text-center p-4 text-sm text-muted-foreground border-t">
-            StaxMap &copy; {new Date().getFullYear()}
-          </footer>
-          <Toaster />
+            {children}
+            <footer className="text-center p-4 text-sm text-muted-foreground border-t">
+              StaxMap &copy; {new Date().getFullYear()}
+            </footer>
+            <Toaster />
         </ThemeProvider>
       </body>
     </html>

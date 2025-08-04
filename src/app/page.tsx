@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, BrainCircuit, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LandingHeader } from '@/components/lexigen/LandingHeader';
 
 const words = ["Technology", "Strategy", "Organisation", "Product", "Ecosystem"];
 
@@ -56,7 +57,8 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-10rem)] w-full">
+    <div className="flex flex-col min-h-screen">
+      <LandingHeader />
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="w-full py-24 md:py-32 lg:py-40 text-center">
@@ -82,7 +84,7 @@ export default function LandingPage() {
               </p>
               <div className="mt-8">
                 <Button asChild size="lg">
-                  <Link href="/radar">
+                  <Link href="/loading">
                     Get Started <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
