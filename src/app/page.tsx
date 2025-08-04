@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, BrainCircuit, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
+import { ArrowRight, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LandingHeader } from '@/components/lexigen/LandingHeader';
 
@@ -39,7 +39,23 @@ const features = [
   },
 ];
 
+const rotatingPhrases = [
+  'Define your tech strategy.',
+  'Define your organization strategy.',
+  'Visualize your technology adoption roadmap.',
+];
+
 export default function LandingPage() {
+  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPhraseIndex((prevIndex) => (prevIndex + 1) % rotatingPhrases.length);
+    }, 3000); // Change phrase every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       <LandingHeader />
@@ -48,7 +64,7 @@ export default function LandingPage() {
         <section className="w-full py-24 md:py-32 lg:py-40 text-center">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
-              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl rainbow-shimmer animate-shimmer leading-tight py-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight rainbow-shimmer animate-shimmer py-1">
                 Visualize Your Technology Landscape
               </h1>
               <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
@@ -60,6 +76,14 @@ export default function LandingPage() {
                     Launch Radar <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
+              </div>
+              <div className="mt-6 h-8 text-center">
+                <span
+                  key={currentPhraseIndex}
+                  className="text-muted-foreground text-lg animate-in fade-in duration-500"
+                >
+                  {rotatingPhrases[currentPhraseIndex]}
+                </span>
               </div>
             </div>
           </div>
