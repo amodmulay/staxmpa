@@ -3,7 +3,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, BrainCircuit, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LandingHeader } from '@/components/lexigen/LandingHeader';
@@ -63,24 +62,6 @@ export default function LandingPage() {
                     Get Started <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-              </div>
-
-              <div className="mt-16 glow-container">
-                <div className="relative rounded-xl border bg-card/50 shadow-lg p-2">
-                    <Image
-                        src="https://placehold.co/1200x680.png"
-                        alt="StaxMap Application Preview"
-                        width={1200}
-                        height={680}
-                        className="rounded-lg"
-                        data-ai-hint="technology radar ui"
-                    />
-                    <div className="absolute top-2 left-2 flex items-center gap-1.5 px-2">
-                      <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                      <div className="h-3 w-3 rounded-full bg-yellow-400"></div>
-                      <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                    </div>
-                </div>
               </div>
             </div>
           </div>
