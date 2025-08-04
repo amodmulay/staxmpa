@@ -102,7 +102,7 @@ const appThemes: ThemeDefinition[] = [
 export default function RadarPage() {
   const { theme: systemTheme } = useTheme();
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
-  const [selectedThemeId, setSelectedThemeId] = useState<string>('monochrome');
+  const [selectedThemeId, setSelectedThemeId] = useState<string>('default');
   const [customColorOverrides, setCustomColorOverrides] = useState<Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>>({});
   
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -122,9 +122,9 @@ export default function RadarPage() {
     if (mounted) {
       if (selectedThemeId === 'sunset' || selectedThemeId === 'monochrome') return; // Don't override user's special selection
       if (systemTheme === 'dark') {
-        setSelectedThemeId('materialDark');
+        if (selectedThemeId !== 'materialDark') setSelectedThemeId('materialDark');
       } else {
-        setSelectedThemeId('default');
+        if (selectedThemeId !== 'default') setSelectedThemeId('default');
       }
       setCustomColorOverrides({});
     }
