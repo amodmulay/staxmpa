@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, BrainCircuit, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,19 +39,7 @@ const features = [
   },
 ];
 
-const rotatingWords = ["Technology", "Strategy", "Organisation", "Product"];
-
 export default function LandingPage() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % rotatingWords.length);
-    }, 3000); // Change word every 3 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div className="flex flex-col min-h-screen">
       <LandingHeader />
@@ -61,24 +49,7 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
               <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl rainbow-shimmer animate-shimmer leading-tight py-1">
-                Visualize Your&nbsp;
-                <span className="inline-block relative h-[1.2em] overflow-hidden">
-                  {rotatingWords.map((word, index) => (
-                     <span
-                      key={word}
-                      className="inline-block transition-transform duration-500 ease-in-out"
-                      style={{
-                        transform: `translateY(${(index - currentIndex) * 100}%)`,
-                        position: index === currentIndex ? 'relative' : 'absolute',
-                        left: 0,
-                        right: 0,
-                      }}
-                    >
-                      {word}
-                    </span>
-                  ))}
-                </span>
-                &nbsp;Landscape
+                Visualize Your Technology Landscape
               </h1>
               <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
                 StaxMap helps you create, manage, and share interactive technology radars. Map your tools, platforms, and frameworks with clarity and confidence.
