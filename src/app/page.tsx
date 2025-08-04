@@ -63,9 +63,9 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="w-full py-24 md:py-32 lg:py-40 text-center">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-3xl mx-auto">
-              <BrainCircuit className="h-16 w-16 text-primary mx-auto mb-6" />
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            <div className="max-w-3xl mx-auto flex flex-col items-center gap-6">
+              <BrainCircuit className="h-16 w-8 text-primary" />
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
                 Visualize Your{' '}
                 <span className="relative inline-block h-[1.2em] overflow-hidden align-bottom">
                   <span className="opacity-0">{words[0]}</span>
@@ -79,10 +79,10 @@ export default function LandingPage() {
                 {' '}
                  Landscape
               </h1>
-              <p className="mt-6 text-lg text-muted-foreground md:text-xl">
+              <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
                 StaxMap helps you create, manage, and share interactive technology radars. Map your tools, platforms, and frameworks with clarity and confidence.
               </p>
-              <div className="mt-8">
+              <div className="mt-2">
                 <Button asChild size="lg">
                   <Link href="/radar">
                     Get Started <ArrowRight className="ml-2 h-5 w-5" />
@@ -97,7 +97,7 @@ export default function LandingPage() {
         <section className="w-full py-20 md:py-28 bg-muted/50">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Packed with Powerful Features</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Packed with Powerful Features</h2>
               <p className="mt-4 text-lg text-muted-foreground">Everything you need to build a clear and actionable technology radar for your team.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
