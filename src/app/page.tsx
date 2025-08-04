@@ -103,12 +103,14 @@ export default function LandingPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
               {features.map((feature, index) => (
-                <div key={index} className="flex flex-col items-start p-6 bg-card rounded-lg border shadow-sm hover:border-primary/50 hover:shadow-lg transition-all">
-                  <div className="bg-primary/10 p-3 rounded-full mb-4 border border-primary/20">
-                    {React.cloneElement(feature.icon, { className: 'h-6 w-6 text-primary'})}
+                <div key={index} className="glow-container">
+                  <div className="flex flex-col items-start p-6 bg-card rounded-lg border shadow-sm h-full">
+                    <div className="bg-primary/10 p-3 rounded-full mb-4 border border-primary/20">
+                      {React.cloneElement(feature.icon, { className: 'h-6 w-6 text-primary'})}
+                    </div>
+                    <h3 className="text-xl font-semibold mt-2">{feature.title}</h3>
+                    <p className="mt-2 text-muted-foreground">{feature.description}</p>
                   </div>
-                  <h3 className="text-xl font-semibold mt-2">{feature.title}</h3>
-                  <p className="mt-2 text-muted-foreground">{feature.description}</p>
                 </div>
               ))}
             </div>
