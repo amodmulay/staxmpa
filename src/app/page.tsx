@@ -50,7 +50,7 @@ export default function LandingPage() {
         <section className="w-full py-24 md:py-32 lg:py-40 text-center">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
-              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl text-gradient">
+              <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl text-gradient leading-tight">
                 Visualize Your Technology Landscape
               </h1>
               <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
