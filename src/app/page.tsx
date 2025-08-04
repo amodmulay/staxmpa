@@ -64,8 +64,13 @@ export default function LandingPage() {
             <div className="max-w-3xl mx-auto">
               <BrainCircuit className="h-16 w-16 text-primary mx-auto mb-6" />
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                Visualize Your <span className="inline-block relative h-[1.2em] overflow-hidden">
-                  <span key={animationKey} className="absolute inset-0 animate-word-cycle">
+                Visualize Your{' '}
+                <span className="relative inline-block h-[1.2em] overflow-hidden align-bottom">
+                  <span className="opacity-0">{words[0]}</span>
+                  <span
+                    key={animationKey}
+                    className="animate-word-cycle absolute left-0 top-0"
+                  >
                     {words[currentWordIndex]}
                   </span>
                 </span>
