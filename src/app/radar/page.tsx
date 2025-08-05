@@ -101,7 +101,6 @@ const appThemes: ThemeDefinition[] = [
 // --- END THEME DEFINITIONS ---
 
 export default function RadarPage() {
-  const { theme: systemTheme } = useTheme();
   const router = useRouter();
   const [baseRegionDefinitions, setBaseRegionDefinitions] = useState<BaseRegion[]>(initialRegionDefinitions);
   const [selectedThemeId, setSelectedThemeId] = useState<string>('monochrome');

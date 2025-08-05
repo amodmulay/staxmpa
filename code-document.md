@@ -1,3 +1,4 @@
+
 # StaxMap: Developer Documentation
 
 Welcome to the StaxMap project! This document serves as a technical guide for developers. It covers the project's architecture, state management, key components, and common development tasks.
@@ -32,14 +33,14 @@ staxmap/
 │   │   │   ├── page.tsx        # The main radar application page (client component)
 │   │   │   └── layout.tsx      # Layout for the radar app (header, footer)
 │   │   ├── page.tsx            # The public landing page
-│   │   ├── loading/            # The simulated loading page
 │   │   ├── globals.css         # Global styles and Tailwind CSS theme variables
 │   │   └── layout.tsx          # Root HTML layout for the entire application
 │   │
 │   ├── components/             # Reusable React components
 │   │   ├── lexigen/            # Components specific to the StaxMap application
 │   │   │   ├── RadarView.tsx   # The core interactive SVG radar
-│   │   │   ├── TopicForm.tsx   # Form for adding new topics
+│   │   │   ├── Sidebar.tsx     # The right-hand control panel container
+│   │   │   ├── RadarControls.tsx # Tabbed controls for adding/configuring topics
 │   │   │   ├── TopicList.tsx   # Table for displaying and managing topics
 │   │   │   └── ...other app-specific components
 │   │   └── ui/                 # Generic UI components from ShadCN (Button, Card, etc.)
@@ -61,7 +62,7 @@ staxmap/
 
 ### Architecture Diagram
 
-The application uses a centralized state management pattern where a single parent component (`RadarPage`) controls the application's state and logic. This state is passed down to presentational child components, which then emit events back up to the parent to modify the state.
+The application uses a centralized state management pattern where a single parent component (`RadarPage`) controls the application's state and logic. This state is passed down to presentational child components, which then emit events back up to the parent to modify the state. The main user controls are consolidated into a sidebar.
 
 ```mermaid
 graph TD
@@ -70,27 +71,30 @@ graph TD
     end
 
     subgraph "Presentational UI Components"
-        B[<b>TopicForm</b><br><i>Adds new topics</i>]
         C[<b>RadarView</b><br><i>Renders the interactive SVG radar</i>]
         D[<b>TopicList</b><br><i>Displays and filters all topics</i>]
-        E[<b>Radar Configuration</b><br><i>Controls themes, regions, colors, etc.</i>]
+        E[<b>Sidebar</b><br><i>Container for all controls</i>]
     end
 
-    A -- "regions, onAddTopic()" --> B
+    subgraph "Controls (inside Sidebar)"
+        F[<b>RadarControls</b><br><i>Holds tabs for TopicForm & Configuration panel, including ThemeSelector</i>]
+    end
+
+    A -- "State & handlers for all controls" --> E
     A -- "regions, topics, topicPositions, onTopicPositionChange()" --> C
     A -- "topics, regions, onRemoveTopic()" --> D
-    A -- "regions, themes, onRegionConfigChange(), onThemeChange()" --> E
+    
+    E --> F
 
-    B -- "Calls onAddTopic(name, regionId)" --> A
+    F -- "Calls state handlers (e.g., onAddTopic, onThemeChange)" --> A
     C -- "Calls onTopicPositionChange(topicId, pos, newRegionId)" --> A
     D -- "Calls onRemoveTopic(topicId)" --> A
-    E -- "Calls config change handlers" --> A
 
     style A fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px
-    style B fill:#fff,stroke:#333
     style C fill:#fff,stroke:#333
     style D fill:#fff,stroke:#333
-    style E fill:#fff,stroke:#333
+    style E fill:#f4f4f5,stroke:#999
+    style F fill:#fff,stroke:#333
 ```
 
 ### State Management Strategy
@@ -101,8 +105,8 @@ The state management is intentionally simple, using React's built-in hooks (`use
     -   `regions`: The array of radar rings (e.g., Adopt, Assess).
     -   `topics`: The array of technology topics added to the radar.
     -   `topicPositions`: A dictionary mapping a topic's ID to its `{x, y}` coordinates. This is crucial for persisting the position of manually dragged topics.
-    -   `selectedThemeId`: The ID of the currently active color theme.
-    -   `customColorOverrides`: Custom colors applied to specific regions.
+    -   `selectedThemeId`: The ID of the currently active color theme for the radar.
+    -   `customColorOverrides`: Custom colors applied to specific regions, overriding the theme.
     -   `radarSize`: The pixel dimension of the radar view, controlled by a slider.
 
 -   **Unidirectional Data Flow**:
@@ -126,9 +130,10 @@ This is the **most important file** in the application. It acts as the central c
     -   `handleAddTopic`: Creates a new topic and adds it to the `topics` array.
     -   `handleRemoveTopic`: Filters a topic out of the `topics` array.
     -   `handleTopicPositionChange`: This is a key function for interactivity. It's called when a topic is dragged. It updates both the `topicPositions` state (for the UI) and the topic's `regionId` in the `topics` array (for the data model).
-    -   `handleThemeChange`: Switches the active theme.
+    -   `handleThemeChange`: Switches the active radar theme.
     -   `handleRegionConfigChange`: Updates a region's name or color.
     -   `handleScreenshot`: Uses `html2canvas` to capture the radar view as a PNG.
+-   **Navigation Guard**: Contains a `useEffect` hook that checks for a `sessionStorage` item. If not present, it redirects the user to the landing page (`/`).
 
 ### `src/components/lexigen/RadarView.tsx`
 
@@ -143,34 +148,31 @@ This component is responsible for rendering the interactive SVG radar. It is a p
     -   It wraps each topic in a `<Draggable>` component.
     -   The `onStop` handler for the drag event calculates the topic's new distance from the center to determine its new region and calls the `onTopicPositionChange` prop to update the state in `RadarPage`.
 
-### `src/components/lexigen/TopicList.tsx`
+### `src/components/lexigen/RadarControls.tsx`
 
-Displays a filterable and searchable list of all topics.
-
--   **Functionality**:
-    -   Receives the full `topics` and `regions` arrays as props.
-    -   Uses local `useState` for the search term and filter dropdown.
-    -   Uses `useMemo` to efficiently compute `filteredAndSortedTopics` whenever the data or filters change. This prevents re-calculation on every render.
-    -   The "Region" column displays a colored `Badge` that is automatically updated when a topic's `regionId` changes in the parent `RadarPage` state.
+This component consolidates all user controls into a single, tabbed interface inside the sidebar.
+- **Tabs**: It uses ShadCN's `Tabs` to switch between an "Add Topic" view and a "Configure" view.
+- **TopicForm**: The "Add Topic" tab renders the `TopicForm`, which is used to add new technologies to the radar.
+- **Configuration**: The "Configure" tab contains the `ThemeSelector` for picking radar color palettes, a slider to control the `radarSize`, and the interface for editing and adding/removing regions.
 
 ### `src/types/lexigen.ts`
 
 This file defines the core data structures for the entire application. When adding new properties to topics or regions, start here.
 
 -   **`Region`**: Defines a radar ring (`id`, `name`, `color`, `textColor`).
--   **`Topic`**: Defines a technology topic (`id`, `name`,- `regionId`, `angle`, `magnitude`).
+-   **`Topic`**: Defines a technology topic (`id`, `name`, `regionId`, `angle`, `magnitude`).
 -   **`ThemeDefinition`**: Defines the structure for a theme. A key part is the `generateColors` function, which programmatically creates region colors. This makes the theming system highly extensible.
 
 ---
 
 ## 5. How to Make Common Changes
 
-### How to Add a New Theme
+### How to Add a New Radar Theme
 
 1.  **Open `src/app/radar/page.tsx`**.
-2.  **Create a color generator function**: Write a new function with the signature `(baseRegions: BaseRegion[]) => Region[]`. This function will receive the list of regions and should return a new list with `color` and `textColor` properties assigned. Look at `generateMaterialDarkColors` for an example.
-3.  **Add a new `ThemeDefinition`**: In the `appThemes` array, add a new object for your theme, providing a unique `id`, a `name`, your new color generator function, and a `topicDotColor`.
-4.  That's it! The `ThemeSelector` component will automatically pick up the new theme and display it as an option.
+2.  **Create a color generator function**: Write a new function with the signature `(baseRegions: BaseRegion[]) => Region[]`. This function will receive the list of regions and should return a new list with `color` and `textColor` properties assigned. Look at `generateMonochromeColors` for an example.
+3.  **Add a new `ThemeDefinition`**: In the `appThemes` array, add a new object for your theme, providing a unique `id`, a `name` for the UI, your new color generator function, and a `topicDotColor`.
+4.  That's it! The `ThemeSelector` component inside `RadarControls` will automatically pick up the new theme and display it as an option.
 
 ### How to Add a New Field to a Topic
 
