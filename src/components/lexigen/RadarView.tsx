@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useMemo, useCallback } from 'react'; // Full import for React
+import React, { useMemo, useCallback } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Draggable, { type DraggableData, type DraggableEvent } from 'react-draggable';
 import type { Region, Topic } from '@/types/lexigen';
@@ -21,59 +21,6 @@ const DEFAULT_HEIGHT = 600;
 const PADDING = 60;
 const TOPIC_LABEL_OFFSET_Y = 18;
 const TOPIC_DOT_RADIUS = 6;
-
-// Define DraggableTopicItem outside of RadarView or memoize if inside
-interface DraggableTopicItemProps {
-  topic: Topic;
-  position: { x: number; y: number };
-  onStop: (event: DraggableEvent, data: DraggableData) => void;
-  topicRegion?: Region;
-  dotFillColor: string;
-}
-
-const DraggableTopicItem: React.FC<DraggableTopicItemProps> = ({
-  topic,
-  position,
-  onStop,
-  topicRegion,
-  dotFillColor,
-}) => {
-  const nodeRef = React.useRef<SVGGElement>(null); 
-
-  return (
-    <Draggable
-      nodeRef={nodeRef}
-      position={position}
-      onStop={onStop}
-    >
-      <g ref={nodeRef} className="group">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <g className="cursor-pointer">
-              <circle r={TOPIC_DOT_RADIUS} fill={dotFillColor} stroke="hsl(var(--background))" strokeWidth="1.5" />
-              <circle r={TOPIC_DOT_RADIUS / 2} fill={topicRegion?.color.startsWith('hsl(0, 0%, 20%)') || topicRegion?.color.startsWith('hsla(0, 0%, 20%)') ? 'hsl(var(--background))' : 'hsl(var(--primary-foreground))'} />
-            </g>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="font-semibold">{topic.name}</p>
-            <p className="text-sm text-muted-foreground">Region: {topicRegion?.name}</p>
-          </TooltipContent>
-        </Tooltip>
-        <text
-          x={0}
-          y={TOPIC_LABEL_OFFSET_Y}
-          textAnchor="middle"
-          fontSize="10"
-          fill={topicRegion?.textColor || "hsl(var(--foreground))"}
-          className="font-medium select-none pointer-events-none"
-        >
-          {topic.name}
-        </text>
-      </g>
-    </Draggable>
-  );
-};
-DraggableTopicItem.displayName = "DraggableTopicItem";
 
 
 export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
@@ -196,16 +143,40 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
               const currentPosition = topicPositions[topic.id] || getTopicCoordinates(topic);
               const topicRegion = regions.find(r => r.id === topic.regionId);
               const dotFillColor = topicDotColor || 'hsl(var(--primary))';
+              const nodeRef = React.useRef<SVGGElement>(null); 
 
               return (
-                <DraggableTopicItem
+                 <Draggable
                   key={topic.id}
-                  topic={topic}
+                  nodeRef={nodeRef}
                   position={currentPosition}
                   onStop={(e, data) => handleDragStop(topic.id, data)}
-                  topicRegion={topicRegion}
-                  dotFillColor={dotFillColor}
-                />
+                >
+                  <g ref={nodeRef} className="group">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <g className="cursor-pointer">
+                          <circle r={TOPIC_DOT_RADIUS} fill={dotFillColor} stroke="hsl(var(--background))" strokeWidth="1.5" />
+                          <circle r={TOPIC_DOT_RADIUS / 2} fill={topicRegion?.color.startsWith('hsl(0, 0%, 20%)') || topicRegion?.color.startsWith('hsla(0, 0%, 20%)') ? 'hsl(var(--background))' : 'hsl(var(--primary-foreground))'} />
+                        </g>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="font-semibold">{topic.name}</p>
+                        <p className="text-sm text-muted-foreground">Region: {topicRegion?.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <text
+                      x={0}
+                      y={TOPIC_LABEL_OFFSET_Y}
+                      textAnchor="middle"
+                      fontSize="10"
+                      fill={topicRegion?.textColor || "hsl(var(--foreground))"}
+                      className="font-medium select-none pointer-events-none"
+                    >
+                      {topic.name}
+                    </text>
+                  </g>
+                </Draggable>
               );
             })}
           </svg>
@@ -216,5 +187,3 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
 );
 
 RadarView.displayName = "RadarView";
-
-    

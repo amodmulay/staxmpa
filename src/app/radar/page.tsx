@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes';
 import type { Region, Topic, ThemeDefinition, BaseRegion } from '@/types/lexigen';
 import { useToast } from '@/hooks/use-toast';
 import { RadarView } from '@/components/lexigen/RadarView';
-import TopicList from '@/components/lexigen/TopicList';
+import { TopicList } from '@/components/lexigen/TopicList';
 import { Sidebar } from '@/components/lexigen/Sidebar';
 import { RadarControls } from '@/components/lexigen/RadarControls';
 import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
@@ -264,26 +264,6 @@ export default function RadarPage() {
     });
   };
   
-  const radarControls = (
-    <RadarControls
-        regions={regions}
-        onAddTopic={handleAddTopic}
-        radarSize={radarSize}
-        onRadarSizeChange={setRadarSize}
-        onScreenshot={handleScreenshot}
-        onRegionConfigChange={handleRegionConfigChange}
-        onRemoveRegion={handleRemoveRegion}
-        onAddRegion={handleAddRegion}
-        baseRegionDefinitions={baseRegionDefinitions}
-      >
-        <ThemeSelector
-            themes={appThemes}
-            selectedThemeId={selectedThemeId}
-            onSelectTheme={handleThemeChange}
-        />
-    </RadarControls>
-  );
-
   if (!mounted) {
     return (
       <div className="flex-grow w-full max-w-7xl mx-auto p-4 flex items-center justify-center">
@@ -310,11 +290,25 @@ export default function RadarPage() {
         <TopicList topics={topics} onRemoveTopic={handleRemoveTopic} regions={regions} />
       </div>
       
-      <div className="hidden md:block">
-        <Sidebar>
-          {radarControls}
-        </Sidebar>
-      </div>
+      <Sidebar>
+          <RadarControls
+              regions={regions}
+              onAddTopic={handleAddTopic}
+              radarSize={radarSize}
+              onRadarSizeChange={setRadarSize}
+              onScreenshot={handleScreenshot}
+              onRegionConfigChange={handleRegionConfigChange}
+              onRemoveRegion={handleRemoveRegion}
+              onAddRegion={handleAddRegion}
+              baseRegionDefinitions={baseRegionDefinitions}
+            >
+              <ThemeSelector
+                  themes={appThemes}
+                  selectedThemeId={selectedThemeId}
+                  onSelectTheme={handleThemeChange}
+              />
+          </RadarControls>
+      </Sidebar>
     </div>
   );
 }

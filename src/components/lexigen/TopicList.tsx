@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ interface TopicListProps {
 
 const ALL_REGIONS_VALUE = 'all-regions-filter-value';
 
-const TopicList: React.FC<TopicListProps> = ({ topics, regions, onRemoveTopic }) => {
+export const TopicList: React.FC<TopicListProps> = ({ topics, regions, onRemoveTopic }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRegion, setFilterRegion] = useState(ALL_REGIONS_VALUE);
 
@@ -118,5 +119,3 @@ const TopicList: React.FC<TopicListProps> = ({ topics, regions, onRemoveTopic })
     </Card>
   );
 };
-
-export default TopicList;
