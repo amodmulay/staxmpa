@@ -17,7 +17,7 @@ interface TopicListProps {
 
 const ALL_REGIONS_VALUE = 'all-regions-filter-value';
 
-export const TopicList: React.FC<TopicListProps> = ({ topics, regions, onRemoveTopic }) => {
+export function TopicList({ topics, regions, onRemoveTopic }: TopicListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRegion, setFilterRegion] = useState(ALL_REGIONS_VALUE);
 

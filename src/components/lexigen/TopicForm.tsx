@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from 'react'; // Changed from type-only import
+import { useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -35,7 +35,7 @@ export function TopicForm({ regions, onAddTopic }: TopicFormProps) {
   });
 
   // Effect to update default regionId if regions change or on initial load
-  React.useEffect(() => {
+  useEffect(() => {
     if (regions.length > 0 && !form.getValues("regionId")) {
       form.setValue("regionId", regions[0].id);
     }

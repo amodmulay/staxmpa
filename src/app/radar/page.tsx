@@ -5,7 +5,6 @@ import type * as React from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import html2canvas from 'html2canvas';
-import { useTheme } from 'next-themes';
 import type { Region, Topic, ThemeDefinition, BaseRegion } from '@/types/lexigen';
 import { useToast } from '@/hooks/use-toast';
 import { RadarView } from '@/components/lexigen/RadarView';
