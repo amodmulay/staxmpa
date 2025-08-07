@@ -177,10 +177,17 @@ export default function RadarPage() {
   const handleScreenshot = async () => {
     if (radarRef.current) {
       try {
-        const canvasOptions: Partial<html2canvas.Options> = { 
+        // Get the computed background color, which resolves CSS variables
+        const computedStyle = window.getComputedStyle(radarRef.current);
+        const backgroundColor = computedStyle.backgroundColor;
+
+        const canvasOptions: Partial<html2canvas.Options> = {
           useCORS: true,
-          scale: 2, 
-          backgroundColor: currentTheme.screenshotBackgroundColor || null,
+          scale: 2,
+          // Use the resolved color, or the theme's specific color if it's not a CSS var
+          backgroundColor: currentTheme.screenshotBackgroundColor?.startsWith('hsl')
+            ? backgroundColor
+            : currentTheme.screenshotBackgroundColor,
         };
         
         const canvas = await html2canvas(radarRef.current, canvasOptions);
