@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useMemo, useCallback } from 'react';
-import Draggable, { type DraggableData } from 'react-draggable';
 import type { Region, Topic } from '@/types/lexigen';
 import { DraggableTopicItem } from './DraggableTopicItem';
 
@@ -58,23 +57,6 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
     }
 
     const bandThickness = radarRadius / numRegions;
-    
-    const handleDragStop = (topicId: string, data: DraggableData) => {
-        const { x, y } = data;
-        const deltaX = x - centerX;
-        const deltaY = y - centerY;
-        const distanceFromCenter = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
-        // Calculate the new region based on the distance from the center
-        let newRegionIndex = Math.floor(distanceFromCenter / bandThickness);
-        // Clamp the index to be within the bounds of the regions array
-        newRegionIndex = Math.min(Math.max(newRegionIndex, 0), numRegions - 1);
-    
-        const newRegionId = regions[newRegionIndex]?.id;
-    
-        // Call the prop to update both position and region in the parent state
-        onTopicPositionChange(topicId, { x, y }, newRegionId);
-    };
 
     return (
       <div ref={ref} className={className} {...props} style={{ width, height, background: 'hsl(var(--background))' }}>
@@ -134,27 +116,23 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
               );
             })}
 
-            {topics.map((topic) => {
-                const nodeRef = React.useRef<SVGGElement>(null);
-                const currentPosition = topicPositions[topic.id] || getTopicCoordinates(topic);
-                
-                return (
-                    <Draggable
-                        key={topic.id}
-                        nodeRef={nodeRef}
-                        position={currentPosition}
-                        onStop={(e, data) => handleDragStop(topic.id, data)}
-                    >
-                        <g ref={nodeRef}>
-                            <DraggableTopicItem
-                                topic={topic}
-                                region={regions.find(r => r.id === topic.regionId)}
-                                topicDotColor={topicDotColor}
-                            />
-                        </g>
-                    </Draggable>
-                );
-            })}
+            {topics.map((topic) => (
+                <DraggableTopicItem
+                    key={topic.id}
+                    topic={topic}
+                    region={regions.find(r => r.id === topic.regionId)}
+                    topicDotColor={topicDotColor}
+                    initialPosition={topicPositions[topic.id] || getTopicCoordinates(topic)}
+                    onTopicPositionChange={onTopicPositionChange}
+                    options={{
+                        centerX,
+                        centerY,
+                        bandThickness,
+                        numRegions
+                    }}
+                    regions={regions}
+                />
+            ))}
           </svg>
       </div>
     );
