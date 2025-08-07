@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useMemo, useCallback } from 'react';
+import Draggable, { type DraggableData } from 'react-draggable';
 import type { Region, Topic } from '@/types/lexigen';
 import { DraggableTopicItem } from './DraggableTopicItem';
 
@@ -58,7 +59,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
 
     const bandThickness = radarRadius / numRegions;
     
-    const handleDragStop = (topicId: string, data: { x: number, y: number }) => {
+    const handleDragStop = (topicId: string, data: DraggableData) => {
         const { x, y } = data;
         const deltaX = x - centerX;
         const deltaY = y - centerY;
@@ -133,17 +134,27 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
               );
             })}
 
-            {topics.map((topic) => (
-              <DraggableTopicItem
-                key={topic.id}
-                topic={topic}
-                regions={regions}
-                topicPositions={topicPositions}
-                getTopicCoordinates={getTopicCoordinates}
-                handleDragStop={handleDragStop}
-                topicDotColor={topicDotColor}
-              />
-            ))}
+            {topics.map((topic) => {
+                const nodeRef = React.useRef<SVGGElement>(null);
+                const currentPosition = topicPositions[topic.id] || getTopicCoordinates(topic);
+                
+                return (
+                    <Draggable
+                        key={topic.id}
+                        nodeRef={nodeRef}
+                        position={currentPosition}
+                        onStop={(e, data) => handleDragStop(topic.id, data)}
+                    >
+                        <g ref={nodeRef}>
+                            <DraggableTopicItem
+                                topic={topic}
+                                region={regions.find(r => r.id === topic.regionId)}
+                                topicDotColor={topicDotColor}
+                            />
+                        </g>
+                    </Draggable>
+                );
+            })}
           </svg>
       </div>
     );
