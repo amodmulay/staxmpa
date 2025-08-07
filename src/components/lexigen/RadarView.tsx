@@ -2,9 +2,8 @@
 "use client";
 
 import React, { useMemo, useCallback } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import Draggable, { type DraggableData, type DraggableEvent } from 'react-draggable';
 import type { Region, Topic } from '@/types/lexigen';
+import { DraggableTopicItem } from './DraggableTopicItem';
 
 interface RadarViewProps extends React.HTMLAttributes<HTMLDivElement> {
   regions: Region[];
@@ -19,9 +18,6 @@ interface RadarViewProps extends React.HTMLAttributes<HTMLDivElement> {
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 600;
 const PADDING = 60;
-const TOPIC_LABEL_OFFSET_Y = 18;
-const TOPIC_DOT_RADIUS = 6;
-
 
 export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
   ({ regions, topics, topicPositions, onTopicPositionChange, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT, className, topicDotColor, ...props }, ref) => {
@@ -62,7 +58,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
 
     const bandThickness = radarRadius / numRegions;
     
-    const handleDragStop = (topicId: string, data: DraggableData) => {
+    const handleDragStop = (topicId: string, data: { x: number, y: number }) => {
         const { x, y } = data;
         const deltaX = x - centerX;
         const deltaY = y - centerY;
@@ -81,8 +77,17 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
 
     return (
       <div ref={ref} className={className} {...props} style={{ width, height, background: 'hsl(var(--background))' }}>
-        <TooltipProvider>
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+            <defs>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
             {reversedRegionsForRendering.map((region, index) => {
               const outerR = (numRegions - index) * bandThickness;
               return (
@@ -93,7 +98,8 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                     r={outerR}
                     fill={region.color}
                     stroke="hsl(var(--foreground))"
-                    strokeWidth="1"
+                    strokeWidth="0.5"
+                    strokeOpacity="0.3"
                   />
                   <text
                     x={centerX}
@@ -109,19 +115,6 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
               );
             })}
 
-            {Array.from({ length: numRegions -1 }).map((_, i) => (
-                <circle
-                key={`grid-${i}`}
-                cx={centerX}
-                cy={centerY}
-                r={(i + 1) * bandThickness}
-                fill="none"
-                stroke="hsl(var(--foreground))"
-                strokeWidth="0.5"
-                strokeDasharray="2,2"
-                />
-            ))}
-
             {Array.from({ length: 8 }).map((_, i) => {
               const angle = i * (360 / 8);
               const angleRad = (angle - 90) * (Math.PI / 180);
@@ -134,53 +127,24 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                   y2={centerY + radarRadius * Math.sin(angleRad)}
                   stroke="hsl(var(--foreground))"
                   strokeWidth="0.5"
-                  strokeDasharray="2,2"
+                  strokeOpacity="0.5"
+                  strokeDasharray="4,4"
                 />
               );
             })}
 
-            {topics.map((topic) => {
-              const currentPosition = topicPositions[topic.id] || getTopicCoordinates(topic);
-              const topicRegion = regions.find(r => r.id === topic.regionId);
-              const dotFillColor = topicDotColor || 'hsl(var(--primary))';
-              const nodeRef = React.useRef<SVGGElement>(null); 
-
-              return (
-                 <Draggable
-                  key={topic.id}
-                  nodeRef={nodeRef}
-                  position={currentPosition}
-                  onStop={(e, data) => handleDragStop(topic.id, data)}
-                >
-                  <g ref={nodeRef} className="group">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <g className="cursor-pointer">
-                          <circle r={TOPIC_DOT_RADIUS} fill={dotFillColor} stroke="hsl(var(--background))" strokeWidth="1.5" />
-                          <circle r={TOPIC_DOT_RADIUS / 2} fill={topicRegion?.color.startsWith('hsl(0, 0%, 20%)') || topicRegion?.color.startsWith('hsla(0, 0%, 20%)') ? 'hsl(var(--background))' : 'hsl(var(--primary-foreground))'} />
-                        </g>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="font-semibold">{topic.name}</p>
-                        <p className="text-sm text-muted-foreground">Region: {topicRegion?.name}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <text
-                      x={0}
-                      y={TOPIC_LABEL_OFFSET_Y}
-                      textAnchor="middle"
-                      fontSize="10"
-                      fill={topicRegion?.textColor || "hsl(var(--foreground))"}
-                      className="font-medium select-none pointer-events-none"
-                    >
-                      {topic.name}
-                    </text>
-                  </g>
-                </Draggable>
-              );
-            })}
+            {topics.map((topic) => (
+              <DraggableTopicItem
+                key={topic.id}
+                topic={topic}
+                regions={regions}
+                topicPositions={topicPositions}
+                getTopicCoordinates={getTopicCoordinates}
+                handleDragStop={handleDragStop}
+                topicDotColor={topicDotColor}
+              />
+            ))}
           </svg>
-        </TooltipProvider>
       </div>
     );
   }

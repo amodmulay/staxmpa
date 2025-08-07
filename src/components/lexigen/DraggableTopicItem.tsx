@@ -1,0 +1,70 @@
+
+"use client";
+
+import React from 'react';
+import Draggable, { type DraggableData } from 'react-draggable';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { Region, Topic } from '@/types/lexigen';
+
+interface DraggableTopicItemProps {
+  topic: Topic;
+  regions: Region[];
+  topicPositions: Record<string, { x: number; y: number }>;
+  getTopicCoordinates: (topic: Topic) => { x: number; y: number };
+  handleDragStop: (topicId: string, data: DraggableData) => void;
+  topicDotColor?: string;
+}
+
+const TOPIC_LABEL_OFFSET_Y = 18;
+const TOPIC_DOT_RADIUS = 6;
+
+export function DraggableTopicItem({
+  topic,
+  regions,
+  topicPositions,
+  getTopicCoordinates,
+  handleDragStop,
+  topicDotColor,
+}: DraggableTopicItemProps) {
+  const nodeRef = React.useRef<SVGGElement>(null);
+
+  const currentPosition = topicPositions[topic.id] || getTopicCoordinates(topic);
+  const topicRegion = regions.find((r) => r.id === topic.regionId);
+  const dotFillColor = topicDotColor || 'hsl(var(--primary))';
+
+  return (
+    <Draggable
+      nodeRef={nodeRef}
+      position={currentPosition}
+      onStop={(e, data) => handleDragStop(topic.id, data)}
+    >
+      <g ref={nodeRef} className="group">
+        <TooltipProvider>
+            <Tooltip>
+            <TooltipTrigger asChild>
+                <g className="cursor-grab active:cursor-grabbing">
+                <circle r={TOPIC_DOT_RADIUS * 1.5} fill={dotFillColor} style={{ filter: 'url(#glow)' }} opacity="0.5" />
+                <circle r={TOPIC_DOT_RADIUS} fill={dotFillColor} stroke="hsl(var(--background))" strokeWidth="1.5" />
+                <circle r={TOPIC_DOT_RADIUS / 2} fill={topicRegion?.color.startsWith('hsl(0, 0%, 20%)') || topicRegion?.color.startsWith('hsla(0, 0%, 20%)') ? 'hsl(var(--background))' : 'hsl(var(--primary-foreground))'} />
+                </g>
+            </TooltipTrigger>
+            <TooltipContent>
+                <p className="font-semibold">{topic.name}</p>
+                <p className="text-sm text-muted-foreground">Region: {topicRegion?.name}</p>
+            </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+        <text
+          x={0}
+          y={TOPIC_LABEL_OFFSET_Y}
+          textAnchor="middle"
+          fontSize="10"
+          fill={topicRegion?.textColor || "hsl(var(--foreground))"}
+          className="font-medium select-none pointer-events-none"
+        >
+          {topic.name}
+        </text>
+      </g>
+    </Draggable>
+  );
+}
