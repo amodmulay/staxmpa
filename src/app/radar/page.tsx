@@ -12,12 +12,15 @@ import { TopicList } from '@/components/lexigen/TopicList';
 import { Sidebar } from '@/components/lexigen/Sidebar';
 import { RadarControls } from '@/components/lexigen/RadarControls';
 import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
 
 const initialRegionDefinitions: BaseRegion[] = [
-  { id: 'today', name: 'Adopt' },
-  { id: 'tomorrow', name: 'Assess' },
-  { id: 'recent-future', name: 'Trial' },
-  { id: 'distant-future', name: 'Hold' },
+  { id: 'today', name: 'Today' },
+  { id: 'tomorrow', name: 'Tomorrow' },
+  { id: 'recent-future', name: 'Recent Future' },
+  { id: 'distant-future', name: 'Distant Future' },
 ];
 
 // --- THEME DEFINITIONS ---
@@ -108,6 +111,7 @@ export default function RadarPage() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicPositions, setTopicPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [radarSize, setRadarSize] = useState(600);
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
 
   const radarRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -155,6 +159,10 @@ export default function RadarPage() {
       magnitude: 0.3 + Math.random() * 0.4,
     };
     setTopics((prevTopics) => [...prevTopics, newTopic]);
+    // Close the sheet on mobile after adding a topic
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsMobileSheetOpen(false);
+    }
   };
 
   const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, newRegionId?: string) => {
@@ -278,10 +286,48 @@ export default function RadarPage() {
     );
   }
 
+  const controlsComponent = (
+    <RadarControls
+      regions={regions}
+      onAddTopic={handleAddTopic}
+      radarSize={radarSize}
+      onRadarSizeChange={setRadarSize}
+      onScreenshot={handleScreenshot}
+      onRegionConfigChange={handleRegionConfigChange}
+      onRemoveRegion={handleRemoveRegion}
+      onAddRegion={handleAddRegion}
+      baseRegionDefinitions={baseRegionDefinitions}
+    >
+      <ThemeSelector
+        themes={appThemes}
+        selectedThemeId={selectedThemeId}
+        onSelectTheme={handleThemeChange}
+      />
+    </RadarControls>
+  );
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px] lg:grid-cols-[minmax(0,1fr)_400px] gap-6 h-full">
       <div className="flex flex-col gap-6">
-        <div className="flex-grow flex items-center justify-center rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6">
+        <div className="flex-grow flex items-center justify-center rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6 relative">
+            <div className="absolute top-2 right-2 md:hidden">
+              <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Settings className="h-5 w-5" />
+                    <span className="sr-only">Open Controls</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Radar Controls</SheetTitle>
+                  </SheetHeader>
+                  <div className="py-4">
+                    {controlsComponent}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
             <RadarView 
               ref={radarRef} 
               regions={regions} 
@@ -296,25 +342,11 @@ export default function RadarPage() {
         <TopicList topics={topics} onRemoveTopic={handleRemoveTopic} regions={regions} />
       </div>
       
-      <Sidebar>
-          <RadarControls
-              regions={regions}
-              onAddTopic={handleAddTopic}
-              radarSize={radarSize}
-              onRadarSizeChange={setRadarSize}
-              onScreenshot={handleScreenshot}
-              onRegionConfigChange={handleRegionConfigChange}
-              onRemoveRegion={handleRemoveRegion}
-              onAddRegion={handleAddRegion}
-              baseRegionDefinitions={baseRegionDefinitions}
-            >
-              <ThemeSelector
-                  themes={appThemes}
-                  selectedThemeId={selectedThemeId}
-                  onSelectTheme={handleThemeChange}
-              />
-          </RadarControls>
-      </Sidebar>
+      <div className="hidden md:block">
+        <Sidebar>
+            {controlsComponent}
+        </Sidebar>
+      </div>
     </div>
   );
 }

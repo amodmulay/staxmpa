@@ -13,7 +13,7 @@ export function Sidebar({
     children: React.ReactNode;
   }) {
     return (
-        <Card className={cn("h-full w-full overflow-y-auto hidden md:block", className)}>
+        <Card className={cn("h-full w-full overflow-y-auto", className)}>
             {children}
         </Card>
     );
