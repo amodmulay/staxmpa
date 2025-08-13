@@ -14,7 +14,7 @@ import { RadarControls } from '@/components/lexigen/RadarControls';
 import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 
 const initialRegionDefinitions: BaseRegion[] = [
   { id: 'today', name: 'Today' },
@@ -314,7 +314,7 @@ export default function RadarPage() {
               <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="icon">
-                    <Settings className="h-5 w-5" />
+                    <SlidersHorizontal className="h-5 w-5" />
                     <span className="sr-only">Open Controls</span>
                   </Button>
                 </SheetTrigger>
