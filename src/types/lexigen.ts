@@ -1,3 +1,4 @@
+
 export interface Region {
   id: string;
   name: string;
@@ -26,3 +27,15 @@ export interface ThemeDefinition {
   // otherwise, it will use the SVG's background (derived from CSS vars).
   screenshotBackgroundColor?: string; 
 }
+
+// Data structure for importing/exporting the entire radar state
+export interface RadarData {
+  baseRegionDefinitions: BaseRegion[];
+  topics: Topic[];
+  topicPositions: Record<string, { x: number; y: number }>;
+  selectedThemeId: string;
+  customColorOverrides: Record<string, Partial<Pick<Region, 'color' | 'textColor'>>>;
+  radarSize: number;
+}
+
+    

@@ -5,7 +5,7 @@ import type * as React from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import html2canvas from 'html2canvas';
-import type { Region, Topic, ThemeDefinition, BaseRegion } from '@/types/lexigen';
+import type { Region, Topic, ThemeDefinition, BaseRegion, RadarData } from '@/types/lexigen';
 import { useToast } from '@/hooks/use-toast';
 import { RadarView } from '@/components/lexigen/RadarView';
 import { TopicList } from '@/components/lexigen/TopicList';
@@ -15,6 +15,7 @@ import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { SlidersHorizontal } from 'lucide-react';
+import { z } from 'zod';
 
 const initialRegionDefinitions: BaseRegion[] = [
   { id: 'today', name: 'Today' },
@@ -101,6 +102,22 @@ const appThemes: ThemeDefinition[] = [
 ];
 
 // --- END THEME DEFINITIONS ---
+// Zod schema for validating the imported JSON file
+const radarDataSchema: z.ZodType<RadarData> = z.object({
+  baseRegionDefinitions: z.array(z.object({ id: z.string(), name: z.string() })),
+  topics: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    regionId: z.string(),
+    angle: z.number(),
+    magnitude: z.number(),
+  })),
+  topicPositions: z.record(z.object({ x: z.number(), y: z.number() })),
+  selectedThemeId: z.string(),
+  customColorOverrides: z.record(z.object({ color: z.string().optional(), textColor: z.string().optional() })),
+  radarSize: z.number(),
+});
+
 
 export default function RadarPage() {
   const router = useRouter();
@@ -277,7 +294,67 @@ export default function RadarPage() {
       duration: 2000,
     });
   };
-  
+
+  const handleExport = () => {
+    const radarData: RadarData = {
+      baseRegionDefinitions,
+      topics,
+      topicPositions,
+      selectedThemeId,
+      customColorOverrides,
+      radarSize,
+    };
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(radarData, null, 2))}`;
+    const link = document.createElement('a');
+    link.href = jsonString;
+    link.download = 'staxmap-radar.json';
+    link.click();
+    toast({ title: "Radar Exported", description: "Your radar configuration has been saved." });
+  };
+
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    fileReader.readAsText(file, "UTF-8");
+    fileReader.onload = e => {
+      const fileContent = e.target?.result;
+      if (typeof fileContent !== 'string') {
+        toast({ title: "Import Failed", description: "Could not read file content.", variant: "destructive" });
+        return;
+      }
+      try {
+        const parsedData = JSON.parse(fileContent);
+        const validationResult = radarDataSchema.safeParse(parsedData);
+
+        if (!validationResult.success) {
+          console.error("Invalid radar data format:", validationResult.error.flatten());
+          toast({ title: "Import Failed", description: "Invalid or corrupt radar file format.", variant: "destructive" });
+          return;
+        }
+        
+        const data: RadarData = validationResult.data;
+
+        // Restore state from imported data
+        setBaseRegionDefinitions(data.baseRegionDefinitions);
+        setTopics(data.topics);
+        setTopicPositions(data.topicPositions);
+        setSelectedThemeId(data.selectedThemeId);
+        setCustomColorOverrides(data.customColorOverrides);
+        setRadarSize(data.radarSize);
+
+        toast({ title: "Import Successful", description: "Your radar has been loaded." });
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        toast({ title: "Import Failed", description: "The selected file is not a valid JSON file.", variant: "destructive" });
+      } finally {
+        // Reset the file input so the same file can be loaded again
+        event.target.value = '';
+      }
+    };
+  };
+
   if (!mounted) {
     return (
       <div className="flex-grow w-full max-w-7xl mx-auto p-4 flex items-center justify-center">
@@ -296,6 +373,8 @@ export default function RadarPage() {
       onRegionConfigChange={handleRegionConfigChange}
       onRemoveRegion={handleRemoveRegion}
       onAddRegion={handleAddRegion}
+      onExport={handleExport}
+      onImport={handleImport}
       baseRegionDefinitions={baseRegionDefinitions}
     >
       <ThemeSelector
@@ -350,3 +429,5 @@ export default function RadarPage() {
     </div>
   );
 }
+
+    

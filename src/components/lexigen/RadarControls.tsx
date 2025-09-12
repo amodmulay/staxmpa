@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { BaseRegion, Region } from '@/types/lexigen';
-import { Download, Palette, PlusCircle, Settings2 } from 'lucide-react';
+import { Download, Upload, Palette, PlusCircle, Settings2, Trash2 } from 'lucide-react';
 import { hslToHex } from '@/lib/utils';
 import React from 'react';
 
@@ -26,6 +26,8 @@ interface RadarControlsProps {
   onRegionConfigChange: (index: number, field: 'name' | 'color' | 'textColor', value: string) => void;
   onRemoveRegion: (id: string) => void;
   onAddRegion: () => void;
+  onExport: () => void;
+  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
   children?: React.ReactNode; // For theme selector
 }
 
@@ -39,8 +41,12 @@ export function RadarControls({
   onRegionConfigChange,
   onRemoveRegion,
   onAddRegion,
+  onExport,
+  onImport,
   children,
 }: RadarControlsProps) {
+
+  const importInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <Tabs defaultValue="add-topic" className="w-full">
@@ -84,7 +90,28 @@ export function RadarControls({
                 onValueChange={(value) => onRadarSizeChange(value[0])}
               />
             </div>
-            <Button onClick={onScreenshot} className="w-full">
+            
+            <Separator />
+
+            <div className="grid grid-cols-2 gap-2">
+                <Button onClick={onExport} variant="outline">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export
+                </Button>
+                <Button onClick={() => importInputRef.current?.click()} variant="outline">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Import
+                </Button>
+                <input
+                    type="file"
+                    ref={importInputRef}
+                    onChange={onImport}
+                    className="hidden"
+                    accept=".json"
+                />
+            </div>
+
+             <Button onClick={onScreenshot} className="w-full">
               <Download className="mr-2 h-4 w-4" />
               Capture Screenshot
             </Button>
@@ -96,13 +123,18 @@ export function RadarControls({
               <div className="space-y-3">
               {regions.map((region, index) => (
                 <Card key={region.id} className="p-3 bg-muted/50">
-                  <Label htmlFor={`region-name-${index}`} className="text-sm font-medium">Region {index + 1}: {region.name}</Label>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label htmlFor={`region-name-${index}`} className="text-sm font-medium">Region {index + 1}</Label>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => onRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <Input
                     id={`region-name-${index}`}
                     type="text"
                     value={region.name}
                     onChange={(e) => onRegionConfigChange(index, 'name', e.target.value)}
-                    className="mt-1 mb-2"
+                    className="mb-2"
                   />
                   <div className="flex items-center space-x-2">
                     <Label htmlFor={`region-color-${index}`} className="text-xs">BG:</Label>
@@ -121,14 +153,13 @@ export function RadarControls({
                       onChange={(e) => onRegionConfigChange(index, 'textColor', e.target.value)}
                         className="w-12 h-8 p-1"
                     />
-                    <Button variant="destructive" size="sm" onClick={() => onRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>&times;</Button>
                   </div>
                 </Card>
               ))}
               </div>
             </ScrollArea>
               <Button onClick={onAddRegion} variant="outline" className="w-full">
-              <Palette className="mr-2 h-4 w-4" /> Add Region
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Region
             </Button>
           </CardContent>
         </Card>
@@ -136,3 +167,5 @@ export function RadarControls({
     </Tabs>
   )
 }
+
+    
