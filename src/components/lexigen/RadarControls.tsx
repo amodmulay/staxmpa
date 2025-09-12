@@ -3,7 +3,7 @@
 
 import { TopicForm } from '@/components/lexigen/TopicForm';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -49,19 +49,34 @@ export function RadarControls({
   const importInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <Tabs defaultValue="add-topic" className="w-full">
+    <Tabs defaultValue="manage-items" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="add-topic">
+        <TabsTrigger value="manage-items">
             <PlusCircle className="mr-2 h-4 w-4" />
-            Add Topic
+            Manage Items
         </TabsTrigger>
         <TabsTrigger value="configure">
             <Settings2 className="mr-2 h-4 w-4" />
             Configure
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="add-topic">
-        <TopicForm regions={regions} onAddTopic={onAddTopic} />
+      <TabsContent value="manage-items">
+        <div className="space-y-4">
+          <TopicForm regions={regions} onAddTopic={onAddTopic} />
+          <Card className="shadow-lg border-none">
+            <CardHeader>
+              <CardTitle className="flex items-center text-xl">
+                Manage Regions
+              </CardTitle>
+              <CardDescription>Add or remove the concentric rings of your radar.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={onAddRegion} variant="outline" className="w-full">
+                <PlusCircle className="mr-2 h-4 w-4" /> Add New Region
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </TabsContent>
       <TabsContent value="configure">
         <Card className="shadow-lg border-none">
@@ -118,7 +133,7 @@ export function RadarControls({
             
             <Separator />
 
-            <Label className="text-md font-medium">Regions</Label>
+            <Label className="text-md font-medium">Edit Regions</Label>
             <ScrollArea className="h-[250px] pr-3">
               <div className="space-y-3">
               {regions.map((region, index) => (
@@ -158,14 +173,9 @@ export function RadarControls({
               ))}
               </div>
             </ScrollArea>
-              <Button onClick={onAddRegion} variant="outline" className="w-full">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Region
-            </Button>
           </CardContent>
         </Card>
       </TabsContent>
     </Tabs>
   )
 }
-
-    
