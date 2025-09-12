@@ -5,6 +5,7 @@ import { GeistMono } from 'geist/font/mono';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from '@/components/theme-provider';
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: 'StaxMap - Visualize Your Technology Landscape',
@@ -31,6 +32,7 @@ export default function RootLayout({
             </footer>
             <Toaster />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
