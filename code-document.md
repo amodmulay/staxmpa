@@ -5,7 +5,7 @@ Welcome to the StaxMap project! This document serves as a technical guide for de
 
 ## 1. High-Level Overview
 
-StaxMap is a web application built with Next.js that allows users to create, visualize, and manage technology radars. Users can define concentric regions (like "Adopt", "Trial"), add technology topics to these regions, and then interact with the visualization by dragging topics and customizing the appearance.
+StaxMap is a web application built with Next.js that allows users to create, visualize, and manage technology radars. Users can define concentric regions (like "Adopt", "Trial"), add technology topics to these regions, and then interact with the visualization by dragging topics and customizing the appearance. The entire state of the radar can be saved to a JSON file and loaded back into the application.
 
 ### Core Technologies
 
@@ -17,6 +17,7 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Drag & Drop**: [react-draggable](https://github.com/react-grid-layout/react-draggable)
 - **Form Management**: [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)
+- **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
 - **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/)
 
 ---
@@ -30,6 +31,8 @@ staxmap/
 ├── src/
 │   ├── app/                    # Next.js App Router: Pages and Layouts
 │   │   ├── radar/
+│   │   │   ├── __tests__/      # Jest tests for the radar page
+│   │   │   │   └── page.test.tsx
 │   │   │   ├── page.tsx        # The main radar application page (client component)
 │   │   │   └── layout.tsx      # Layout for the radar app (header, footer)
 │   │   ├── page.tsx            # The public landing page
@@ -39,7 +42,7 @@ staxmap/
 │   ├── components/             # Reusable React components
 │   │   ├── lexigen/            # Components specific to the StaxMap application
 │   │   │   ├── RadarView.tsx   # The core interactive SVG radar
-│   │   │   ├── Sidebar.tsx     # The right-hand control panel container
+│   │   │   ├── Sidebar.tsx     # The right-hand control panel container (desktop)
 │   │   │   ├── RadarControls.tsx # Tabbed controls for adding/configuring topics
 │   │   │   ├── TopicList.tsx   # Table for displaying and managing topics
 │   │   │   └── ...other app-specific components
@@ -50,7 +53,7 @@ staxmap/
 │   ├── lib/                    # Utility functions (e.g., cn for classnames)
 │   │
 │   └── types/                  # TypeScript type definitions
-│       └── lexigen.ts          # Core application types (Region, Topic, Theme)
+│       └── lexigen.ts          # Core application types (Region, Topic, Theme, RadarData)
 │
 ├── public/                     # Static assets (images, etc.)
 └── package.json                # Project dependencies and scripts
@@ -62,7 +65,7 @@ staxmap/
 
 ### Architecture Diagram
 
-The application uses a centralized state management pattern where a single parent component (`RadarPage`) controls the application's state and logic. This state is passed down to presentational child components, which then emit events back up to the parent to modify the state. The main user controls are consolidated into a sidebar.
+The application uses a centralized state management pattern where a single parent component (`RadarPage`) controls the application's state and logic. This state is passed down to presentational child components, which then emit events back up to the parent to modify the state. On desktop, user controls are in a sidebar; on mobile, they are in a slide-out sheet.
 
 ```mermaid
 graph TD
@@ -73,11 +76,11 @@ graph TD
     subgraph "Presentational UI Components"
         C[<b>RadarView</b><br><i>Renders the interactive SVG radar</i>]
         D[<b>TopicList</b><br><i>Displays and filters all topics</i>]
-        E[<b>Sidebar</b><br><i>Container for all controls</i>]
+        E[<b>Sidebar (Desktop) / Sheet (Mobile)</b><br><i>Container for all controls</i>]
     end
 
-    subgraph "Controls (inside Sidebar)"
-        F[<b>RadarControls</b><br><i>Holds tabs for TopicForm & Configuration panel, including ThemeSelector</i>]
+    subgraph "Controls (inside Sidebar/Sheet)"
+        F[<b>RadarControls</b><br><i>Holds tabs for item management & configuration</i>]
     end
 
     A -- "State & handlers for all controls" --> E
@@ -108,6 +111,7 @@ The state management is intentionally simple, using React's built-in hooks (`use
     -   `selectedThemeId`: The ID of the currently active color theme for the radar.
     -   `customColorOverrides`: Custom colors applied to specific regions, overriding the theme.
     -   `radarSize`: The pixel dimension of the radar view, controlled by a slider.
+    -   `isMobileSheetOpen`: Controls the visibility of the control panel on mobile.
 
 -   **Unidirectional Data Flow**:
     1.  **State is passed down as props**: `RadarPage` passes the state down to its child components (e.g., `RadarView` receives `topics` and `regions`). These child components are "dumb" and purely presentational; they just render what they are given.
@@ -133,6 +137,9 @@ This is the **most important file** in the application. It acts as the central c
     -   `handleThemeChange`: Switches the active radar theme.
     -   `handleRegionConfigChange`: Updates a region's name or color.
     -   `handleScreenshot`: Uses `html2canvas` to capture the radar view as a PNG.
+    -   `handleExport`: Serializes the entire radar state to a JSON file and triggers a download.
+    -   `handleImport`: Reads a JSON file, validates it with a Zod schema, and restores the application state.
+-   **Layout Logic**: Manages the responsive layout, rendering the `Sidebar` for desktop and the `Sheet` for mobile.
 -   **Navigation Guard**: Contains a `useEffect` hook that checks for a `sessionStorage` item. If not present, it redirects the user to the landing page (`/`).
 
 ### `src/components/lexigen/RadarView.tsx`
@@ -150,10 +157,10 @@ This component is responsible for rendering the interactive SVG radar. It is a p
 
 ### `src/components/lexigen/RadarControls.tsx`
 
-This component consolidates all user controls into a single, tabbed interface inside the sidebar.
-- **Tabs**: It uses ShadCN's `Tabs` to switch between an "Add Topic" view and a "Configure" view.
-- **TopicForm**: The "Add Topic" tab renders the `TopicForm`, which is used to add new technologies to the radar.
-- **Configuration**: The "Configure" tab contains the `ThemeSelector` for picking radar color palettes, a slider to control the `radarSize`, and the interface for editing and adding/removing regions.
+This component consolidates all user controls into a single, tabbed interface inside the sidebar/sheet.
+- **Tabs**: It uses ShadCN's `Tabs` to switch between a "Manage Items" view and a "Configure" view.
+- **TopicForm & Region Management**: The "Manage Items" tab renders the `TopicForm` for adding technologies and a button to add new regions.
+- **Configuration**: The "Configure" tab contains the `ThemeSelector`, a slider to control the `radarSize`, and the interface for editing and customizing regions.
 
 ### `src/types/lexigen.ts`
 
@@ -162,6 +169,7 @@ This file defines the core data structures for the entire application. When addi
 -   **`Region`**: Defines a radar ring (`id`, `name`, `color`, `textColor`).
 -   **`Topic`**: Defines a technology topic (`id`, `name`, `regionId`, `angle`, `magnitude`).
 -   **`ThemeDefinition`**: Defines the structure for a theme. A key part is the `generateColors` function, which programmatically creates region colors. This makes the theming system highly extensible.
+-   **`RadarData`**: Defines the complete, serializable state of the radar. This schema is used by Zod to validate imported files, ensuring data integrity.
 
 ---
 
@@ -178,7 +186,7 @@ This file defines the core data structures for the entire application. When addi
 
 Let's say you want to add a `description` to each topic.
 
-1.  **Update the Type**: Go to `src/types/lexigen.ts` and add `description: string;` to the `Topic` interface.
+1.  **Update the Type**: Go to `src/types/lexigen.ts` and add `description: string;` to the `Topic` interface. You'll also need to add it to the `RadarData` interface and the Zod schema in `page.tsx` if you want it to be imported/exported.
 2.  **Update the Form**:
     -   Go to `src/components/lexigen/TopicForm.tsx`.
     -   Add a `description` field to the `topicFormSchema` (the Zod schema) with validation rules.
@@ -192,7 +200,7 @@ Let's say you want to add a `description` to each topic.
 
 ### How to Change the Default Regions
 
-If you want to change the initial regions from "Adopt, Assess, Trial, Hold" to something else:
+If you want to change the initial regions from "Today, Tomorrow, etc." to something else:
 
 1.  **Open `src/app/radar/page.tsx`**.
 2.  Find the `initialRegionDefinitions` constant at the top of the file.

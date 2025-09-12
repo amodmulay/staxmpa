@@ -9,9 +9,10 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 - **Real-time Topic Management**: Add topics to different regions, and see them appear instantly on the radar.
 - **Interactive Visualization**: Drag-and-drop topics within the radar to fine-tune their position and change their region.
 - **Theming and Customization**: Switch between pre-defined themes (e.g. Monochrome, Sunset) or customize the colors of each region to match your branding.
+- **Import/Export**: Save your complete radar configuration to a JSON file and import it later to continue your work.
 - **Screenshot Capture**: Export a high-resolution PNG image of your radar for presentations and documentation.
 - **Filtering and Searching**: Easily find topics in the list with search and region-based filtering.
-- **Responsive Design**: Works on both desktop and mobile devices.
+- **Responsive Design**: Works on both desktop and mobile devices, with dedicated controls for smaller screens.
 
 ## Tech Stack
 
@@ -21,6 +22,7 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [ShadCN UI](https://ui.shadcn.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
+- **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
 - **AI/Generative Features**: [Google Genkit](https://firebase.google.com/docs/genkit) (Configured but not yet implemented)
 - **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/)
 
@@ -80,7 +82,7 @@ This will execute all `*.test.tsx` files and report the results in your terminal
 
 ### Architecture Diagram
 
-The application follows a component-based architecture where the main page (`RadarPage`) acts as a central controller, managing state and passing data and functions down to child presentational components. The controls are consolidated into a sidebar for a cleaner UI.
+The application follows a component-based architecture where the main page (`RadarPage`) acts as a central controller, managing state and passing data and functions down to child presentational components. The controls are consolidated into a sidebar on desktop and a slide-out sheet on mobile.
 
 ```mermaid
 graph TD
@@ -91,16 +93,17 @@ graph TD
     subgraph "Presentational UI Components"
         C[<b>RadarView</b><br><i>Renders the interactive SVG radar</i>]
         D[<b>TopicList</b><br><i>Displays and filters all topics</i>]
-        E[<b>Sidebar</b><br><i>Container for controls</i>]
+        E[<b>Sidebar (Desktop) / Sheet (Mobile)</b><br><i>Container for controls</i>]
     end
 
-    subgraph "Controls (inside Sidebar)"
-        F[<b>RadarControls</b><br><i>Tabbed container for TopicForm & Configuration</i>]
+    subgraph "Controls (inside Sidebar/Sheet)"
+        F[<b>RadarControls</b><br><i>Tabbed container for managing items & configuration</i>]
     end
     
     A -- "regions, topics, topicPositions, onTopicPositionChange()" --> C
     A -- "topics, regions, onRemoveTopic()" --> D
     A -- "Props for all controls" --> E
+    A -- "Handles Import/Export" --> D
 
     E --> F
 
@@ -126,8 +129,9 @@ The state management in StaxMap is intentionally simple and centralized, followi
     - `selectedThemeId`: The ID of the currently active theme.
     - `customColorOverrides`: Custom colors applied to specific regions.
     - `radarSize`: The pixel dimensions (width & height) of the radar view.
+    - `isMobileSheetOpen`: A boolean to control the visibility of the control panel on mobile devices.
 
-- **Lifting State Up**: This is the core principle used. `RadarPage` holds the state and defines the functions that can modify it (e.g., `handleAddTopic`, `handleTopicPositionChange`).
+- **Lifting State Up**: This is the core principle used. `RadarPage` holds the state and defines the functions that can modify it (e.g., `handleAddTopic`, `handleTopicPositionChange`, `handleImport`, `handleExport`).
 
 - **Unidirectional Data Flow**:
     1.  **State is passed down**: `RadarPage` passes the state down to its child components as props (e.g., `RadarView` receives `topics` and `regions`). These child components are purely presentational; they render what they are given.
@@ -144,6 +148,8 @@ staxmap/
 ├── src/
 │   ├── app/                    # Next.js App Router: Pages and Layouts
 │   │   ├── radar/
+│   │   │   ├── __tests__/      # Jest tests for the radar page
+│   │   │   │   └── page.test.tsx
 │   │   │   ├── page.tsx        # The main radar application page
 │   │   │   └── layout.tsx      # Layout for the radar app (header, footer)
 │   │   ├── page.tsx            # The public landing page
@@ -184,7 +190,7 @@ This section details the most important files and their functions within the app
 This is the **central hub** of the application. As a client component (`"use client"`), it manages the entire state of the radar and its layout.
 
 - **State Management**: It uses `useState` hooks to manage all application state (see State Management section above).
-- **Layout**: It arranges the main components on the page, including the `RadarView`, `TopicList`, and the `Sidebar`.
+- **Layout**: It arranges the main components on the page, including the `RadarView` and `TopicList`. It conditionally renders the `Sidebar` for desktop and a `Sheet` with a trigger button for mobile.
 - **Core Functions**:
     - `handleAddTopic`: Creates a new topic object with a random position and adds it to the `topics` state.
     - `handleRemoveTopic`: Removes a topic from the `topics` state.
@@ -192,6 +198,8 @@ This is the **central hub** of the application. As a client component (`"use cli
     - `handleThemeChange`: Updates the selected radar theme from the `ThemeSelector`.
     - `handleRegionConfigChange`: Allows users to change the name and colors of radar regions.
     - `handleScreenshot`: Uses the `html2canvas` library to capture the radar view as a PNG and trigger a download.
+    - `handleExport`: Gathers the complete radar state into a `RadarData` object and downloads it as a JSON file.
+    - `handleImport`: Reads a `RadarData` JSON file, validates it, and restores the application state from the file.
 - **Navigation Guard**: It includes logic to redirect users to the homepage if they haven't visited it first in their session.
 
 ### `src/components/lexigen/RadarView.tsx`
@@ -208,9 +216,9 @@ This is a pure presentation component responsible for rendering the interactive 
 
 ### `src/components/lexigen/Sidebar.tsx` & `RadarControls.tsx`
 
-These components work together to create the configuration panel.
-- **`Sidebar`**: A simple container component that provides the consistent styling for the right-hand panel.
-- **`RadarControls`**: This component houses the user controls. It uses a tabbed interface to switch between the `TopicForm` (for adding new items) and the "Configure" panel, which includes the `ThemeSelector`, radar size slider, and region editors. This consolidation saves significant screen space.
+These components work together to create the configuration panel, which is displayed in the sidebar on desktop and a slide-out sheet on mobile.
+- **`Sidebar`**: A simple container component that provides the consistent styling for the right-hand panel on desktop.
+- **`RadarControls`**: This component houses the user controls. It uses a tabbed interface to switch between "Manage Items" (for adding topics and regions) and the "Configure" panel (for themes, radar size, and region editing).
 
 ### `src/components/lexigen/TopicList.tsx`
 
@@ -229,3 +237,4 @@ This file is central to the application's data structure, defining the core type
 - **`Region`**: Defines the structure for a radar ring, including its `id`, `name`, `color`, and `textColor`.
 - **`Topic`**: Defines the structure for a technology topic, including its `id`, `name`, `regionId`, and its position (`angle` and `magnitude`).
 - **`ThemeDefinition`**: Defines the structure for a theme, which includes a `generateColors` function that dynamically creates region colors. This makes the theming system modular and extensible.
+- **`RadarData`**: Defines the complete, serializable state of the radar for the import/export feature.
