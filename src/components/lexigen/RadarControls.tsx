@@ -134,8 +134,8 @@ export function RadarControls({
             <Separator />
 
             <Label className="text-md font-medium">Edit Regions</Label>
-            <ScrollArea className="h-[250px] pr-3">
-              <div className="space-y-3">
+            <ScrollArea className="h-[250px]">
+              <div className="space-y-3 pr-3">
               {regions.map((region, index) => (
                 <Card key={region.id} className="p-3 bg-muted/50">
                   <div className="flex justify-between items-center mb-2">
