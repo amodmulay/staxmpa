@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { BaseRegion, Region } from '@/types/lexigen';
-import { Download, Upload, Palette, PlusCircle, Settings2, Trash2 } from 'lucide-react';
+import { Download, PlusCircle, Settings2, Trash2 } from 'lucide-react';
 import { hslToHex } from '@/lib/utils';
 import React from 'react';
 
@@ -26,8 +26,6 @@ interface RadarControlsProps {
   onRegionConfigChange: (index: number, field: 'name' | 'color' | 'textColor', value: string) => void;
   onRemoveRegion: (id: string) => void;
   onAddRegion: () => void;
-  onExport: () => void;
-  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
   children?: React.ReactNode; // For theme selector
 }
 
@@ -41,12 +39,8 @@ export function RadarControls({
   onRegionConfigChange,
   onRemoveRegion,
   onAddRegion,
-  onExport,
-  onImport,
   children,
 }: RadarControlsProps) {
-
-  const importInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <Tabs defaultValue="manage-items" className="w-full flex flex-col h-full">
@@ -109,25 +103,7 @@ export function RadarControls({
               
               <Separator />
 
-              <div className="grid grid-cols-2 gap-2">
-                  <Button onClick={onExport} variant="outline">
-                      <Download className="mr-2 h-4 w-4" />
-                      Export
-                  </Button>
-                  <Button onClick={() => importInputRef.current?.click()} variant="outline">
-                      <Upload className="mr-2 h-4 w-4" />
-                      Import
-                  </Button>
-                  <input
-                      type="file"
-                      ref={importInputRef}
-                      onChange={onImport}
-                      className="hidden"
-                      accept=".json"
-                  />
-              </div>
-
-               <Button onClick={onScreenshot} className="w-full">
+              <Button onClick={onScreenshot} className="w-full">
                 <Download className="mr-2 h-4 w-4" />
                 Capture Screenshot
               </Button>

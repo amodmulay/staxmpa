@@ -14,7 +14,7 @@ import { RadarControls } from '@/components/lexigen/RadarControls';
 import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, Download, Upload } from 'lucide-react';
 import { z } from 'zod';
 
 const initialRegionDefinitions: BaseRegion[] = [
@@ -131,6 +131,7 @@ export default function RadarPage() {
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
 
   const radarRef = useRef<HTMLDivElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
 
@@ -350,7 +351,7 @@ export default function RadarPage() {
         toast({ title: "Import Failed", description: "The selected file is not a valid JSON file.", variant: "destructive" });
       } finally {
         // Reset the file input so the same file can be loaded again
-        event.target.value = '';
+        if (event.target) event.target.value = '';
       }
     };
   };
@@ -373,8 +374,6 @@ export default function RadarPage() {
       onRegionConfigChange={handleRegionConfigChange}
       onRemoveRegion={handleRemoveRegion}
       onAddRegion={handleAddRegion}
-      onExport={handleExport}
-      onImport={handleImport}
       baseRegionDefinitions={baseRegionDefinitions}
     >
       <ThemeSelector
@@ -418,6 +417,23 @@ export default function RadarPage() {
               topicDotColor={currentTheme.topicDotColor}
             />
         </div>
+        <div className="flex justify-end gap-2">
+            <Button onClick={onExport} variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+            </Button>
+            <Button onClick={() => importInputRef.current?.click()} variant="outline">
+                <Upload className="mr-2 h-4 w-4" />
+                Import
+            </Button>
+            <input
+                type="file"
+                ref={importInputRef}
+                onChange={handleImport}
+                className="hidden"
+                accept=".json"
+            />
+        </div>
         <TopicList topics={topics} onRemoveTopic={handleRemoveTopic} regions={regions} />
       </div>
       
@@ -429,5 +445,3 @@ export default function RadarPage() {
     </div>
   );
 }
-
-    
