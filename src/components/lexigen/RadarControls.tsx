@@ -49,7 +49,7 @@ export function RadarControls({
   const importInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
-    <Tabs defaultValue="manage-items" className="w-full">
+    <Tabs defaultValue="manage-items" className="w-full flex flex-col h-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="manage-items">
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -78,15 +78,15 @@ export function RadarControls({
           </Card>
         </div>
       </TabsContent>
-      <TabsContent value="configure">
-        <Card className="shadow-lg border-none">
+      <TabsContent value="configure" className="flex-grow">
+        <Card className="shadow-lg border-none h-full flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
               <Settings2 className="mr-2 h-6 w-6 text-primary" />
               Radar Configuration
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 flex flex-col flex-grow">
             {children && (
               <>
                 {children}
@@ -134,8 +134,8 @@ export function RadarControls({
             <Separator />
 
             <Label className="text-md font-medium">Edit Regions</Label>
-            <ScrollArea className="h-[250px]">
-              <div className="space-y-3 pr-3">
+            <ScrollArea className="flex-grow">
+              <div className="space-y-3 pr-1">
               {regions.map((region, index) => (
                 <Card key={region.id} className="p-3 bg-muted/50">
                   <div className="flex justify-between items-center mb-2">
