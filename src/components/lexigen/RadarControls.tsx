@@ -86,93 +86,97 @@ export function RadarControls({
               Radar Configuration
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 flex flex-col flex-grow">
-            {children && (
-              <>
-                {children}
-                <Separator />
-              </>
-            )}
+          <CardContent className="flex flex-col flex-grow space-y-4">
+            <div className="space-y-4">
+              {children && (
+                <>
+                  {children}
+                  <Separator />
+                </>
+              )}
 
-            <div className="space-y-2">
-              <Label htmlFor="radar-size-slider">Radar Size: {radarSize}px</Label>
-              <Slider
-                id="radar-size-slider"
-                min={400}
-                max={1000}
-                step={20}
-                value={[radarSize]}
-                onValueChange={(value) => onRadarSizeChange(value[0])}
-              />
-            </div>
-            
-            <Separator />
-
-            <div className="grid grid-cols-2 gap-2">
-                <Button onClick={onExport} variant="outline">
-                    <Download className="mr-2 h-4 w-4" />
-                    Export
-                </Button>
-                <Button onClick={() => importInputRef.current?.click()} variant="outline">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import
-                </Button>
-                <input
-                    type="file"
-                    ref={importInputRef}
-                    onChange={onImport}
-                    className="hidden"
-                    accept=".json"
+              <div className="space-y-2">
+                <Label htmlFor="radar-size-slider">Radar Size: {radarSize}px</Label>
+                <Slider
+                  id="radar-size-slider"
+                  min={400}
+                  max={1000}
+                  step={20}
+                  value={[radarSize]}
+                  onValueChange={(value) => onRadarSizeChange(value[0])}
                 />
-            </div>
-
-             <Button onClick={onScreenshot} className="w-full">
-              <Download className="mr-2 h-4 w-4" />
-              Capture Screenshot
-            </Button>
-            
-            <Separator />
-
-            <Label className="text-md font-medium">Edit Regions</Label>
-            <ScrollArea className="flex-grow">
-              <div className="space-y-3 pr-1">
-              {regions.map((region, index) => (
-                <Card key={region.id} className="p-3 bg-muted/50">
-                  <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor={`region-name-${index}`} className="text-sm font-medium">Region {index + 1}</Label>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => onRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Input
-                    id={`region-name-${index}`}
-                    type="text"
-                    value={region.name}
-                    onChange={(e) => onRegionConfigChange(index, 'name', e.target.value)}
-                    className="mb-2"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <Label htmlFor={`region-color-${index}`} className="text-xs">BG:</Label>
-                    <Input
-                      id={`region-color-${index}`}
-                      type="color"
-                      value={region.color.startsWith('hsl') ? hslToHex(region.color) : region.color}
-                      onChange={(e) => onRegionConfigChange(index, 'color', e.target.value)}
-                      className="w-12 h-8 p-1"
-                    />
-                      <Label htmlFor={`region-text-color-${index}`} className="text-xs">Text:</Label>
-                    <Input
-                      id={`region-text-color-${index}`}
-                      type="color"
-                      value={region.textColor.startsWith('hsl') ? hslToHex(region.textColor) : region.textColor}
-                      onChange={(e) => onRegionConfigChange(index, 'textColor', e.target.value)}
-                        className="w-12 h-8 p-1"
-                    />
-                  </div>
-                </Card>
-              ))}
               </div>
-            </ScrollArea>
+              
+              <Separator />
+
+              <div className="grid grid-cols-2 gap-2">
+                  <Button onClick={onExport} variant="outline">
+                      <Download className="mr-2 h-4 w-4" />
+                      Export
+                  </Button>
+                  <Button onClick={() => importInputRef.current?.click()} variant="outline">
+                      <Upload className="mr-2 h-4 w-4" />
+                      Import
+                  </Button>
+                  <input
+                      type="file"
+                      ref={importInputRef}
+                      onChange={onImport}
+                      className="hidden"
+                      accept=".json"
+                  />
+              </div>
+
+               <Button onClick={onScreenshot} className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                Capture Screenshot
+              </Button>
+              
+              <Separator />
+            </div>
+            
+            <div className="flex flex-col flex-grow space-y-2">
+              <Label className="text-md font-medium">Edit Regions</Label>
+              <ScrollArea className="flex-grow">
+                <div className="space-y-3 pr-1">
+                {regions.map((region, index) => (
+                  <Card key={region.id} className="p-3 bg-muted/50">
+                    <div className="flex justify-between items-center mb-2">
+                      <Label htmlFor={`region-name-${index}`} className="text-sm font-medium">Region {index + 1}</Label>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => onRemoveRegion(region.id)} disabled={baseRegionDefinitions.length <=1 }>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Input
+                      id={`region-name-${index}`}
+                      type="text"
+                      value={region.name}
+                      onChange={(e) => onRegionConfigChange(index, 'name', e.target.value)}
+                      className="mb-2"
+                    />
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor={`region-color-${index}`} className="text-xs">BG:</Label>
+                      <Input
+                        id={`region-color-${index}`}
+                        type="color"
+                        value={region.color.startsWith('hsl') ? hslToHex(region.color) : region.color}
+                        onChange={(e) => onRegionConfigChange(index, 'color', e.target.value)}
+                        className="w-12 h-8 p-1"
+                      />
+                        <Label htmlFor={`region-text-color-${index}`} className="text-xs">Text:</Label>
+                      <Input
+                        id={`region-text-color-${index}`}
+                        type="color"
+                        value={region.textColor.startsWith('hsl') ? hslToHex(region.textColor) : region.textColor}
+                        onChange={(e) => onRegionConfigChange(index, 'textColor', e.target.value)}
+                          className="w-12 h-8 p-1"
+                      />
+                    </div>
+                  </Card>
+                ))}
+                </div>
+              </ScrollArea>
+            </div>
           </CardContent>
         </Card>
       </TabsContent>
