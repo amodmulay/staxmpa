@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Button } from '@/components/ui/button';
 import { SlidersHorizontal, Download, Upload } from 'lucide-react';
 import { z } from 'zod';
+import { AdPlaceholder } from '@/components/lexigen/AdPlaceholder';
 
 const initialRegionDefinitions: BaseRegion[] = [
   { id: 'today', name: 'Today' },
@@ -417,6 +418,7 @@ export default function RadarPage() {
               topicDotColor={currentTheme.topicDotColor}
             />
         </div>
+        <AdPlaceholder />
         <div className="flex justify-end gap-2">
             <Button onClick={handleExport} variant="outline">
                 <Download className="mr-2 h-4 w-4" />

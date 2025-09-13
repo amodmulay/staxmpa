@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowRight, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LandingHeader } from '@/components/lexigen/LandingHeader';
+import { AdPlaceholder } from '@/components/lexigen/AdPlaceholder';
 
 const features = [
   {
@@ -98,6 +99,10 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <div className="container mx-auto px-4 md:px-6">
+          <AdPlaceholder />
+        </div>
 
         {/* Features Section */}
         <section id="features" className="w-full py-20 md:py-28 bg-muted/50">
