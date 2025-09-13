@@ -90,7 +90,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                     textAnchor="middle"
                     fontSize="12"
                     fill={region.textColor}
-                    className="font-semibold select-none pointer-events-none"
+                    className="font-semibold select-none pointer-events-none tracking-wide"
                   >
                     {region.name}
                   </text>
