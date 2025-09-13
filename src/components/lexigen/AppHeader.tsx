@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { BrainCircuit, Coffee } from 'lucide-react';
+import { BrainCircuit, Coffee, BookOpen } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '../ui/button';
 
@@ -13,6 +13,12 @@ export function AppHeader() {
           <h1 className="text-2xl font-semibold text-foreground hidden sm:block">StaxMap</h1>
         </Link>
         <div className="flex items-center gap-4">
+          <Button asChild variant="ghost">
+              <Link href="/learn">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Learn
+              </Link>
+          </Button>
           <Button asChild variant="outline">
             <Link href="https://www.buymeacoffee.com/your-username" target="_blank">
               <Coffee className="mr-2 h-4 w-4" />

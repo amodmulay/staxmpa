@@ -3,10 +3,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
+import { ArrowRight, BookOpen, Cog, Filter, ImageDown, MousePointerClick, Palette, Rows3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LandingHeader } from '@/components/lexigen/LandingHeader';
 import { AdPlaceholder } from '@/components/lexigen/AdPlaceholder';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const features = [
   {
@@ -126,6 +127,54 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+        
+        {/* Learn Section */}
+        <section id="learn" className="w-full py-20 md:py-28">
+            <div className="container mx-auto px-4 md:px-6">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                    <div className="space-y-4">
+                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">What is a Technology Radar?</h2>
+                        <p className="text-lg text-muted-foreground">
+                            A Technology Radar is a powerful tool for visualizing your technology portfolio. It helps you assess which technologies to invest in, which to maintain, and which to retire. It's an essential instrument for aligning your teams and making strategic technology decisions.
+                        </p>
+                        <p className="text-lg text-muted-foreground">
+                            Our learn section provides an in-depth look at the concepts behind the radar, inspired by industry leaders like ThoughtWorks.
+                        </p>
+                        <Button asChild size="lg" className="mt-4">
+                            <Link href="/learn">
+                                <BookOpen className="mr-2 h-5 w-5" />
+                                Learn More
+                            </Link>
+                        </Button>
+                    </div>
+                    <div className="flex justify-center">
+                        <Card className="w-full max-w-md glow-container">
+                            <CardHeader>
+                                <CardTitle>Key Concepts</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4 text-sm">
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-primary/10 p-2 rounded-full border border-primary/20"><Rows3 className="h-5 w-5 text-primary" /></div>
+                                    <div>
+                                        <h4 className="font-semibold">The Regions</h4>
+                                        <p className="text-muted-foreground">Represents the stages of adoption, from what you should be using today ("Adopt") to what you might consider in the future ("Assess" or "Hold").</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-primary/10 p-2 rounded-full border border-primary/20"><MousePointerClick className="h-5 w-5 text-primary" /></div>
+                                    <div>
+                                        <h4 className="font-semibold">The Blips</h4>
+                                        <p className="text-muted-foreground">Each "blip" on the radar is a technology, platform, framework, or tool. Its position indicates its current adoption status.</p>
+                                    </div>
+
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </div>
+        </section>
+
       </main>
     </div>
   );
