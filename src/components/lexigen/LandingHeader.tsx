@@ -1,7 +1,8 @@
 
 import Link from 'next/link';
-import { BrainCircuit } from 'lucide-react';
+import { BrainCircuit, Coffee } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { Button } from '../ui/button';
 
 export function LandingHeader() {
   return (
@@ -12,6 +13,12 @@ export function LandingHeader() {
           <h1 className="text-2xl font-semibold text-foreground hidden sm:block">StaxMap</h1>
         </Link>
         <div className="flex items-center gap-4">
+           <Button asChild variant="outline" className="hidden sm:flex">
+            <Link href="https://www.buymeacoffee.com/your-username" target="_blank">
+              <Coffee className="mr-2 h-4 w-4" />
+              Buy Me a Coffee
+            </Link>
+          </Button>
           <ThemeToggle />
         </div>
       </div>
