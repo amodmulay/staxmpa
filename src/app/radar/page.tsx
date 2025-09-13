@@ -184,7 +184,7 @@ export default function RadarPage() {
     }
   };
 
-  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, newRegionId?: string) => {
+  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, regionList: Region[], newRegionId?: string) => {
     // Update visual position
     setTopicPositions(prevPositions => ({
       ...prevPositions,
@@ -412,7 +412,7 @@ export default function RadarPage() {
               regions={regions} 
               topics={topics} 
               topicPositions={topicPositions}
-              onTopicPositionChange={handleTopicPositionChange}
+              onTopicPositionChange={(...args) => handleTopicPositionChange(...args, regions)}
               width={radarSize} 
               height={radarSize}
               topicDotColor={currentTheme.topicDotColor}

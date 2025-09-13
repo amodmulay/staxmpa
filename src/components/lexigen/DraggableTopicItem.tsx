@@ -43,9 +43,15 @@ export function DraggableTopicItem({
     const deltaY = y - centerY;
     const distanceFromCenter = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
+    // The regions array is rendered from outermost to innermost in the SVG,
+    // but the data is ordered from innermost to outermost.
+    // We need to use the original `regions` prop to find the correct index.
     let newRegionIndex = Math.floor(distanceFromCenter / bandThickness);
     newRegionIndex = Math.min(Math.max(newRegionIndex, 0), numRegions - 1);
-    const newRegionId = regions[newRegionIndex]?.id;
+    
+    // Find the correct region from the original `regions` array (innermost to outermost)
+    const reversedRegions = [...regions].reverse();
+    const newRegionId = reversedRegions[newRegionIndex]?.id;
 
     onTopicPositionChange(topic.id, { x, y }, newRegionId);
   };

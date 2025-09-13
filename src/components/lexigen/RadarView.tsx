@@ -130,7 +130,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                         bandThickness,
                         numRegions
                     }}
-                    regions={regions}
+                    regions={reversedRegionsForRendering}
                 />
             ))}
           </svg>
