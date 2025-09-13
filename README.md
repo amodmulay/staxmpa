@@ -22,7 +22,8 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [ShadCN UI](https://ui.shadcn.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
+- **Analytics**: [Vercel Analytics](https://vercel.com/analytics) & [Vercel Speed Insights](https://vercel.com/speed-insights)
+- **Monetization**: [Google AdSense](https://www.google.com/adsense)
 - **AI/Generative Features**: [Google Genkit](https://firebase.google.com/docs/genkit) (Configured but not yet implemented)
 - **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/)
 
@@ -154,7 +155,7 @@ staxmap/
 │   │   │   └── layout.tsx      # Layout for the radar app (header, footer)
 │   │   ├── page.tsx            # The public landing page
 │   │   ├── globals.css         # Global styles and Tailwind directives
-│   │   └── layout.tsx          # Root HTML layout
+│   │   └── layout.tsx          # Root HTML layout (includes Analytics & AdSense)
 │   │
 │   ├── ai/                     # Genkit AI flows and configuration
 │   │   ├── flows/              # Business logic for AI features
@@ -163,6 +164,7 @@ staxmap/
 │   │
 │   ├── components/             # Reusable React components
 │   │   ├── lexigen/            # App-specific components (RadarView, Sidebar, etc.)
+│   │   │   ├── AdPlaceholder.tsx # Ad placeholder component
 │   │   │   └── __tests__/      # Tests for lexigen components
 │   │   └── ui/                 # Generic UI components from ShadCN
 │   │
@@ -190,7 +192,7 @@ This section details the most important files and their functions within the app
 This is the **central hub** of the application. As a client component (`"use client"`), it manages the entire state of the radar and its layout.
 
 - **State Management**: It uses `useState` hooks to manage all application state (see State Management section above).
-- **Layout**: It arranges the main components on the page, including the `RadarView` and `TopicList`. It conditionally renders the `Sidebar` for desktop and a `Sheet` with a trigger button for mobile.
+- **Layout**: It arranges the main components on the page, including the `RadarView`, `TopicList`, and `AdPlaceholder`. It conditionally renders the `Sidebar` for desktop and a `Sheet` with a trigger button for mobile. It also contains the Import/Export buttons.
 - **Core Functions**:
     - `handleAddTopic`: Creates a new topic object with a random position and adds it to the `topics` state.
     - `handleRemoveTopic`: Removes a topic from the `topics` state.
@@ -238,3 +240,5 @@ This file is central to the application's data structure, defining the core type
 - **`Topic`**: Defines the structure for a technology topic, including its `id`, `name`, `regionId`, and its position (`angle` and `magnitude`).
 - **`ThemeDefinition`**: Defines the structure for a theme, which includes a `generateColors` function that dynamically creates region colors. This makes the theming system modular and extensible.
 - **`RadarData`**: Defines the complete, serializable state of the radar for the import/export feature.
+
+    

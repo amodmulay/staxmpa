@@ -17,7 +17,8 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Drag & Drop**: [react-draggable](https://github.com/react-grid-layout/react-draggable)
 - **Form Management**: [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)
-- **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
+- **Analytics**: [Vercel Analytics](https://vercel.com/analytics) & [Vercel Speed Insights](https://vercel.com/speed-insights)
+- **Monetization**: [Google AdSense](https://www.google.com/adsense)
 - **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/)
 
 ---
@@ -37,7 +38,7 @@ staxmap/
 │   │   │   └── layout.tsx      # Layout for the radar app (header, footer)
 │   │   ├── page.tsx            # The public landing page
 │   │   ├── globals.css         # Global styles and Tailwind CSS theme variables
-│   │   └── layout.tsx          # Root HTML layout for the entire application
+│   │   └── layout.tsx          # Root HTML layout for the entire application (includes Analytics & AdSense)
 │   │
 │   ├── components/             # Reusable React components
 │   │   ├── lexigen/            # Components specific to the StaxMap application
@@ -45,6 +46,7 @@ staxmap/
 │   │   │   ├── Sidebar.tsx     # The right-hand control panel container (desktop)
 │   │   │   ├── RadarControls.tsx # Tabbed controls for adding/configuring topics
 │   │   │   ├── TopicList.tsx   # Table for displaying and managing topics
+│   │   │   ├── AdPlaceholder.tsx # Ad placeholder component
 │   │   │   └── ...other app-specific components
 │   │   └── ui/                 # Generic UI components from ShadCN (Button, Card, etc.)
 │   │
@@ -139,7 +141,7 @@ This is the **most important file** in the application. It acts as the central c
     -   `handleScreenshot`: Uses `html2canvas` to capture the radar view as a PNG.
     -   `handleExport`: Serializes the entire radar state to a JSON file and triggers a download.
     -   `handleImport`: Reads a JSON file, validates it with a Zod schema, and restores the application state.
--   **Layout Logic**: Manages the responsive layout, rendering the `Sidebar` for desktop and the `Sheet` for mobile.
+-   **Layout Logic**: Manages the responsive layout, rendering the `Sidebar` for desktop and the `Sheet` for mobile. It also contains the Import/Export buttons and an `AdPlaceholder`.
 -   **Navigation Guard**: Contains a `useEffect` hook that checks for a `sessionStorage` item. If not present, it redirects the user to the landing page (`/`).
 
 ### `src/components/lexigen/RadarView.tsx`
@@ -213,3 +215,5 @@ const initialRegionDefinitions: BaseRegion[] = [
 ];
 ```
 This is the only place you need to change it. The rest of the application will adapt dynamically.
+
+    
