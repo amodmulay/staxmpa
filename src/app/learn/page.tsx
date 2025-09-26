@@ -10,22 +10,18 @@ export const metadata: Metadata = {
 };
 
 const RadarStructureIllustration = () => (
-    <div className="relative flex justify-center items-center p-4 my-8">
-        <div className="absolute w-72 h-72 rounded-full bg-primary/5 border border-primary/10"></div>
-        <div className="absolute w-52 h-52 rounded-full bg-primary/5 border border-primary/10"></div>
-        <div className="absolute w-32 h-32 rounded-full bg-primary/5 border-primary/10"></div>
-
-        <div className="relative text-center space-y-2">
-            <div className="font-bold text-primary text-sm">Adopt</div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48">
-                 <div className="font-bold text-primary/80 text-sm">Trial</div>
-            </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64">
-                 <div className="font-bold text-primary/60 text-sm">Assess</div>
-            </div>
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80">
-                 <div className="font-bold text-primary/40 text-sm">Hold</div>
-            </div>
+    <div className="relative flex justify-center items-center p-4 my-8 min-h-[320px]">
+        <div className="absolute w-80 h-80 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
+            <span className="font-bold text-primary/40 text-sm -mt-72">Hold</span>
+        </div>
+        <div className="absolute w-60 h-60 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
+            <span className="font-bold text-primary/60 text-sm -mt-52">Assess</span>
+        </div>
+        <div className="absolute w-40 h-40 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
+            <span className="font-bold text-primary/80 text-sm -mt-32">Trial</span>
+        </div>
+        <div className="absolute w-20 h-20 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <span className="font-bold text-primary text-sm">Adopt</span>
         </div>
     </div>
 );
@@ -81,7 +77,7 @@ export default function LearnPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <blockquote className="text-xl font-medium border-l-4 border-primary pl-6 m-0">
+              <blockquote className="text-xl font-medium border-l-4 border-primary pl-6 m-0 !mt-0">
                 The Radar is a document that sets out the changes that we think are currently interesting in software development—things in motion that we think you should pay attention to and consider using in your projects.
                 <footer className="text-sm text-muted-foreground mt-4">— ThoughtWorks Technology Radar</footer>
               </blockquote>
@@ -96,13 +92,13 @@ export default function LearnPage() {
             
             <RadarStructureIllustration />
 
-            <div className="grid md:grid-cols-2 gap-6 my-8">
+            <div className="grid md:grid-cols-2 gap-6 my-8 not-prose">
                 <Card className="bg-muted/30">
                     <CardHeader>
                         <CardTitle className="text-lg">Adopt (or Today)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-base">Technologies in this ring are proven and trusted. They are the standard choice for new projects and have strong internal support. You should be using these.</p>
+                        <p className="text-base text-muted-foreground">Technologies in this ring are proven and trusted. They are the standard choice for new projects and have strong internal support. You should be using these.</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-muted/30">
@@ -110,7 +106,7 @@ export default function LearnPage() {
                         <CardTitle className="text-lg">Trial (or Tomorrow)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-base">Promising technologies that have shown potential. They are ready for wider, but still controlled, adoption on projects that can handle some risk.</p>
+                        <p className="text-base text-muted-foreground">Promising technologies that have shown potential. They are ready for wider, but still controlled, adoption on projects that can handle some risk.</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-muted/30">
@@ -118,7 +114,7 @@ export default function LearnPage() {
                         <CardTitle className="text-lg">Assess (or Recent Future)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-base">Interesting technologies worth exploring. Teams should be actively building proofs-of-concept to understand their potential impact. Not yet ready for production.</p>
+                        <p className="text-base text-muted-foreground">Interesting technologies worth exploring. Teams should be actively building proofs-of-concept to understand their potential impact. Not yet ready for production.</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-muted/30">
@@ -126,7 +122,7 @@ export default function LearnPage() {
                         <CardTitle className="text-lg">Hold (or Distant Future)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-base">Items that are no longer recommended for new development. This could be due to being superseded or being a poor fit. Plan for migration.</p>
+                        <p className="text-base text-muted-foreground">Items that are no longer recommended for new development. This could be due to being superseded or being a poor fit. Plan for migration.</p>
                     </CardContent>
                 </Card>
             </div>
@@ -141,25 +137,41 @@ export default function LearnPage() {
             <p>
               Creating a radar is a collaborative process, not a top-down decree. It's most effective when it reflects the collective intelligence of your development teams.
             </p>
-            <ol>
-              <li>
-                <strong>Gather Candidates:</strong> Collect technology "blips" from across your teams. What tools are people using? What new frameworks are they excited about? What legacy systems are causing pain?
-              </li>
-              <li>
-                <strong>Facilitate Discussion:</strong> The most valuable part of the process is the conversation. A group of senior technologists should facilitate a meeting to discuss each candidate blip and decide where it belongs on the radar. Why should this be in Trial and not Assess? What are the risks? Who will champion it?
-              </li>
-              <li>
-                <strong>Publish and Share:</strong> Once created, the radar should be published and made accessible to everyone in the technology organization. It serves as a guide for developers, a communication tool for management, and a point of alignment for architects.
-              </li>
-              <li>
-                <strong>Iterate:</strong> A radar is a living document. It should be revisited and updated regularly (e.g., every 6-12 months) to reflect changes in the technology landscape and the organization's experience.
-              </li>
-            </ol>
+            <div className="space-y-6 not-prose my-8">
+              <div className="flex items-start gap-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shrink-0">1</div>
+                <div>
+                  <h4 className="font-semibold text-lg text-foreground">Gather Candidates</h4>
+                  <p className="text-muted-foreground">Collect technology "blips" from across your teams. What tools are people using? What new frameworks are they excited about? What legacy systems are causing pain?</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shrink-0">2</div>
+                <div>
+                  <h4 className="font-semibold text-lg text-foreground">Facilitate Discussion</h4>
+                  <p className="text-muted-foreground">The most valuable part of the process is the conversation. A group of senior technologists should facilitate a meeting to discuss each candidate blip and decide where it belongs on the radar. Why should this be in Trial and not Assess? What are the risks? Who will champion it?</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shrink-0">3</div>
+                <div>
+                  <h4 className="font-semibold text-lg text-foreground">Publish and Share</h4>
+                  <p className="text-muted-foreground">Once created, the radar should be published and made accessible to everyone in the technology organization. It serves as a guide for developers, a communication tool for management, and a point of alignment for architects.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold shrink-0">4</div>
+                <div>
+                  <h4 className="font-semibold text-lg text-foreground">Iterate</h4>
+                  <p className="text-muted-foreground">A radar is a living document. It should be revisited and updated regularly (e.g., every 6-12 months) to reflect changes in the technology landscape and the organization's experience.</p>
+                </div>
+              </div>
+            </div>
           </section>
           
           <section>
             <h2>Benefits of Using a Radar</h2>
-             <ul className="space-y-4 !p-0">
+             <ul className="space-y-4 !p-0 my-8">
                 <li className="flex items-start gap-4">
                     <CheckCircle2 className="h-6 w-6 text-green-500 mt-1 shrink-0" />
                     <div>
@@ -195,3 +207,5 @@ export default function LearnPage() {
     </div>
   );
 }
+
+    
