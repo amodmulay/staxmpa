@@ -14,6 +14,11 @@ import { BrainCircuit } from 'lucide-react';
 export const metadata: Metadata = {
   title: 'StaxMap - Visualize Your Technology Landscape',
   description: 'Create, customize, and share interactive technology radars with StaxMap. Learn how to map your tools, platforms, and frameworks for strategic decision-making.',
+  keywords: 'technology radar, tech radar, visualize tech stack, tech strategy, StaxMap, adopt, trial, assess, hold',
+  authors: [{ name: 'StaxMap Team' }],
+  creator: 'StaxMap',
+  publisher: 'StaxMap',
+  robots: 'index, follow',
 };
 
 export default function RootLayout({
@@ -38,7 +43,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-            <div className="flex-grow">
+            <div className="flex-grow flex flex-col">
               {children}
             </div>
             <footer className="bg-muted text-muted-foreground border-t">

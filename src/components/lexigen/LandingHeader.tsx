@@ -12,7 +12,7 @@ export function LandingHeader() {
           <BrainCircuit className="h-8 w-8 text-primary" />
           <h1 className="text-2xl font-semibold text-foreground hidden sm:block">StaxMap</h1>
         </Link>
-        <div className="flex items-center gap-4">
+        <nav className="flex items-center gap-4">
            <Button asChild variant="outline" className="hidden sm:flex">
             <Link href="https://www.buymeacoffee.com/your-username" target="_blank">
               <Coffee className="mr-2 h-4 w-4" />
@@ -20,7 +20,7 @@ export function LandingHeader() {
             </Link>
           </Button>
           <ThemeToggle />
-        </div>
+        </nav>
       </div>
     </header>
   );

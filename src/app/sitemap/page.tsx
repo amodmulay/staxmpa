@@ -7,13 +7,14 @@ import { AppHeader } from '@/components/lexigen/AppHeader';
 
 export const metadata: Metadata = {
   title: 'Sitemap - StaxMap',
-  description: 'Navigate through all the pages available on StaxMap.',
+  description: 'Navigate through all the pages available on StaxMap. Find links to the homepage, radar tool, and our educational content on technology radars.',
 };
 
 const sitemapLinks = [
     { href: '/', title: 'Home', description: 'The main landing page for StaxMap.' },
     { href: '/radar', title: 'Radar Tool', description: 'The interactive application for creating and managing your technology radar.' },
     { href: '/learn', title: 'Learn About Radars', description: 'An educational guide on the concepts and benefits of technology radars.' },
+    { href: '/sitemap.xml', title: 'XML Sitemap', description: 'The machine-readable sitemap for search engine crawlers.' },
 ];
 
 export default function SitemapPage() {
@@ -39,7 +40,7 @@ export default function SitemapPage() {
                         <ul className="space-y-4">
                             {sitemapLinks.map(link => (
                                 <li key={link.href}>
-                                    <Link href={link.href} className="block p-4 rounded-lg hover:bg-muted">
+                                    <Link href={link.href} className="block p-4 rounded-lg hover:bg-muted" target={link.href.endsWith('.xml') ? '_blank' : undefined}>
                                         <h3 className="font-semibold text-lg text-primary">{link.title}</h3>
                                         <p className="text-muted-foreground text-sm">{link.description}</p>
                                     </Link>
