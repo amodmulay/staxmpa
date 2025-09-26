@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   creator: 'StaxMap',
   publisher: 'StaxMap',
   robots: 'index, follow',
+  other: {
+    'google-adsense-account': 'ca-pub-2123835135599458',
+  },
 };
 
 export default function RootLayout({
