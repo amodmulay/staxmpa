@@ -12,6 +12,8 @@ StaxMap is a web application built with Next.js that allows users to create, vis
 - **Import/Export**: Save your complete radar configuration to a JSON file and import it later to continue your work.
 - **Screenshot Capture**: Export a high-resolution PNG image of your radar for presentations and documentation.
 - **Filtering and Searching**: Easily find topics in the list with search and region-based filtering.
+- **Educational Content**: A dedicated "Learn" section explaining the concepts and benefits of technology radars.
+- **SEO Optimized**: Includes a dynamic sitemap and structured metadata for better search engine visibility.
 - **Responsive Design**: Works on both desktop and mobile devices, with dedicated controls for smaller screens.
 
 ## Tech Stack
@@ -150,37 +152,39 @@ staxmap/
 │   ├── app/                    # Next.js App Router: Pages and Layouts
 │   │   ├── radar/
 │   │   │   ├── __tests__/      # Jest tests for the radar page
-│   │   │   │   └── page.test.tsx
 │   │   │   ├── page.tsx        # The main radar application page
-│   │   │   └── layout.tsx      # Layout for the radar app (header, footer)
+│   │   │   └── layout.tsx      # Layout for the radar app
+│   │   ├── learn/
+│   │   │   ├── page.tsx        # The educational "Learn" page
+│   │   │   └── layout.tsx      # Layout for the "Learn" page
+│   │   ├── sitemap/
+│   │   │   └── page.tsx        # The HTML sitemap page
+│   │   ├── sitemap.xml/
+│   │   │   └── route.ts        # Dynamic XML sitemap generator
 │   │   ├── page.tsx            # The public landing page
 │   │   ├── globals.css         # Global styles and Tailwind directives
-│   │   └── layout.tsx          # Root HTML layout (includes Analytics & AdSense)
+│   │   └── layout.tsx          # Root HTML layout (includes Analytics, AdSense, Footer)
 │   │
 │   ├── ai/                     # Genkit AI flows and configuration
-│   │   ├── flows/              # Business logic for AI features
-│   │   ├── genkit.ts           # Genkit initialization
-│   │   └── dev.ts              # Entry point for Genkit dev server
 │   │
 │   ├── components/             # Reusable React components
 │   │   ├── lexigen/            # App-specific components (RadarView, Sidebar, etc.)
 │   │   │   ├── AdPlaceholder.tsx # Ad placeholder component
-│   │   │   └── __tests__/      # Tests for lexigen components
+│   │   │   └── ...
 │   │   └── ui/                 # Generic UI components from ShadCN
 │   │
 │   ├── hooks/                  # Custom React hooks (e.g., use-toast)
 │   │
 │   ├── lib/                    # Utility functions
-│   │   └── utils.ts            # General helper functions (e.g., `cn` for classnames)
 │   │
 │   └── types/                  # TypeScript type definitions
 │       └── lexigen.ts          # Core types for Region, Topic, Theme
 │
-├── jest.config.mjs             # Jest configuration
-├── jest.setup.js               # Jest setup file (imports jest-dom)
-├── next.config.ts              # Next.js configuration
+├── public/
+│   └── robots.txt              # Instructions for search engine crawlers
+│
 ├── package.json                # Project dependencies and scripts
-└── tsconfig.json               # TypeScript configuration
+└── ...
 ```
 
 ## Core Components and Logic
@@ -202,43 +206,22 @@ This is the **central hub** of the application. As a client component (`"use cli
     - `handleScreenshot`: Uses the `html2canvas` library to capture the radar view as a PNG and trigger a download.
     - `handleExport`: Gathers the complete radar state into a `RadarData` object and downloads it as a JSON file.
     - `handleImport`: Reads a `RadarData` JSON file, validates it, and restores the application state from the file.
-- **Navigation Guard**: It includes logic to redirect users to the homepage if they haven't visited it first in their session.
 
 ### `src/components/lexigen/RadarView.tsx`
 
 This is a pure presentation component responsible for rendering the interactive SVG radar.
 
-- **Rendering Logic**:
-    - It receives `regions` and `topics` as props.
-    - It calculates the positions of the concentric circles based on the number of regions.
-    - It maps each topic to coordinates within its assigned region using trigonometry (`Math.cos`, `Math.sin`).
-- **Interactivity**:
-    - It uses `react-draggable` to allow each topic to be moved.
-    - The `handleDragStop` function calculates the topic's new distance from the center to determine its new region and calls the `onTopicPositionChange` prop to update the state in the parent `RadarPage`.
+- **Rendering Logic**: It receives `regions` and `topics` as props and calculates the positions of circles and topics using trigonometry.
+- **Interactivity**: It uses `react-draggable` to allow each topic to be moved. The `onStop` handler calculates the topic's new region and calls a prop to update the state in `RadarPage`.
 
-### `src/components/lexigen/Sidebar.tsx` & `RadarControls.tsx`
+### `src/app/learn/page.tsx`
 
-These components work together to create the configuration panel, which is displayed in the sidebar on desktop and a slide-out sheet on mobile.
-- **`Sidebar`**: A simple container component that provides the consistent styling for the right-hand panel on desktop.
-- **`RadarControls`**: This component houses the user controls. It uses a tabbed interface to switch between "Manage Items" (for adding topics and regions) and the "Configure" panel (for themes, radar size, and region editing).
+An educational page that explains the theory and benefits of using a Technology Radar. It uses a combination of well-structured text, custom SVG illustrations, and styled cards to present the information in an engaging way, serving as valuable content for both users and search engines.
 
-### `src/components/lexigen/TopicList.tsx`
+### `src/app/layout.tsx`
 
-Displays a filterable and searchable list of all topics that have been added to the radar.
-
-- **Functionality**:
-    - Receives the full `topics` and `regions` arrays as props.
-    - Uses `useState` to manage local state for the search term and region filter.
-    - Uses `useMemo` to efficiently compute `filteredAndSortedTopics` whenever the topics or filters change.
-    - Includes a button to remove a topic, which calls the `onRemoveTopic` prop from `RadarPage`.
-
-### `src/types/lexigen.ts`
-
-This file is central to the application's data structure, defining the core types used across components.
-
-- **`Region`**: Defines the structure for a radar ring, including its `id`, `name`, `color`, and `textColor`.
-- **`Topic`**: Defines the structure for a technology topic, including its `id`, `name`, `regionId`, and its position (`angle` and `magnitude`).
-- **`ThemeDefinition`**: Defines the structure for a theme, which includes a `generateColors` function that dynamically creates region colors. This makes the theming system modular and extensible.
-- **`RadarData`**: Defines the complete, serializable state of the radar for the import/export feature.
-
-    
+The root layout for the entire application. It's responsible for the `<html>` and `<body>` tags and includes providers and scripts that are global to the app:
+-   **`ThemeProvider`** for dark/light mode.
+-   **Vercel Analytics and Speed Insights** scripts.
+-   **Google AdSense** script.
+-   A comprehensive **site footer** with navigation links.

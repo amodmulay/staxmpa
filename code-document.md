@@ -32,20 +32,23 @@ staxmap/
 ├── src/
 │   ├── app/                    # Next.js App Router: Pages and Layouts
 │   │   ├── radar/
-│   │   │   ├── __tests__/      # Jest tests for the radar page
-│   │   │   │   └── page.test.tsx
 │   │   │   ├── page.tsx        # The main radar application page (client component)
-│   │   │   └── layout.tsx      # Layout for the radar app (header, footer)
+│   │   │   └── layout.tsx      # Layout for the radar app
+│   │   ├── learn/
+│   │   │   ├── page.tsx        # The educational "Learn" page
+│   │   │   └── layout.tsx      # Layout for the "Learn" page
+│   │   ├── sitemap/
+│   │   │   └── page.tsx        # The HTML sitemap page
+│   │   ├── sitemap.xml/
+│   │   │   └── route.ts        # Dynamic XML sitemap generator
 │   │   ├── page.tsx            # The public landing page
 │   │   ├── globals.css         # Global styles and Tailwind CSS theme variables
-│   │   └── layout.tsx          # Root HTML layout for the entire application (includes Analytics & AdSense)
+│   │   └── layout.tsx          # Root HTML layout (includes Analytics, AdSense, Footer)
 │   │
 │   ├── components/             # Reusable React components
 │   │   ├── lexigen/            # Components specific to the StaxMap application
 │   │   │   ├── RadarView.tsx   # The core interactive SVG radar
 │   │   │   ├── Sidebar.tsx     # The right-hand control panel container (desktop)
-│   │   │   ├── RadarControls.tsx # Tabbed controls for adding/configuring topics
-│   │   │   ├── TopicList.tsx   # Table for displaying and managing topics
 │   │   │   ├── AdPlaceholder.tsx # Ad placeholder component
 │   │   │   └── ...other app-specific components
 │   │   └── ui/                 # Generic UI components from ShadCN (Button, Card, etc.)
@@ -57,7 +60,8 @@ staxmap/
 │   └── types/                  # TypeScript type definitions
 │       └── lexigen.ts          # Core application types (Region, Topic, Theme, RadarData)
 │
-├── public/                     # Static assets (images, etc.)
+├── public/
+│   └── robots.txt              # Instructions for search engine crawlers
 └── package.json                # Project dependencies and scripts
 ```
 
@@ -67,7 +71,7 @@ staxmap/
 
 ### Architecture Diagram
 
-The application uses a centralized state management pattern where a single parent component (`RadarPage`) controls the application's state and logic. This state is passed down to presentational child components, which then emit events back up to the parent to modify the state. On desktop, user controls are in a sidebar; on mobile, they are in a slide-out sheet.
+The application uses a centralized state management pattern where a single parent component (`RadarPage`) controls the application's state and logic. This state is passed down to presentational child components, which then emit events back up to the parent to modify the state.
 
 ```mermaid
 graph TD
@@ -106,7 +110,7 @@ graph TD
 
 The state management is intentionally simple, using React's built-in hooks (`useState`, `useMemo`, `useCallback`) without external libraries like Redux or Zustand. This approach is known as **"Lifting State Up"**.
 
--   **Single Source of Truth**: The `RadarPage` component (`src/app/radar/page.tsx`) is the heart of the application. Marked with `"use client"`, it holds all critical pieces of state:
+-   **Single Source of Truth**: The `RadarPage` component (`src/app/radar/page.tsx`) is the heart of the application. Marked with `"use client"`, it holds all critical pieces of state.
     -   `regions`: The array of radar rings (e.g., Adopt, Assess).
     -   `topics`: The array of technology topics added to the radar.
     -   `topicPositions`: A dictionary mapping a topic's ID to its `{x, y}` coordinates. This is crucial for persisting the position of manually dragged topics.
@@ -156,13 +160,6 @@ This component is responsible for rendering the interactive SVG radar. It is a p
 -   **Interactivity**:
     -   It wraps each topic in a `<Draggable>` component.
     -   The `onStop` handler for the drag event calculates the topic's new distance from the center to determine its new region and calls the `onTopicPositionChange` prop to update the state in `RadarPage`.
-
-### `src/components/lexigen/RadarControls.tsx`
-
-This component consolidates all user controls into a single, tabbed interface inside the sidebar/sheet.
-- **Tabs**: It uses ShadCN's `Tabs` to switch between a "Manage Items" view and a "Configure" view.
-- **TopicForm & Region Management**: The "Manage Items" tab renders the `TopicForm` for adding technologies and a button to add new regions.
-- **Configuration**: The "Configure" tab contains the `ThemeSelector`, a slider to control the `radarSize`, and the interface for editing and customizing regions.
 
 ### `src/types/lexigen.ts`
 
@@ -215,5 +212,3 @@ const initialRegionDefinitions: BaseRegion[] = [
 ];
 ```
 This is the only place you need to change it. The rest of the application will adapt dynamically.
-
-    
