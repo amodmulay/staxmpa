@@ -1,4 +1,4 @@
-# **App Name**: LexiGen
+# **App Name**: StaxMap
 
 ## Core Features:
 
