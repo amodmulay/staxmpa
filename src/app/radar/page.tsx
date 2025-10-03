@@ -14,7 +14,7 @@ import { RadarControls } from '@/components/lexigen/RadarControls';
 import { ThemeSelector } from '@/components/lexigen/ThemeSelector';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { SlidersHorizontal, Download, Upload } from 'lucide-react';
+import { SlidersHorizontal, Download, Upload, ImageDown } from 'lucide-react';
 import { z } from 'zod';
 import { AdPlaceholder } from '@/components/lexigen/AdPlaceholder';
 
@@ -184,7 +184,7 @@ export default function RadarPage() {
     }
   };
 
-  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, regionList: Region[], newRegionId?: string) => {
+  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, newRegionId?: string) => {
     // Update visual position
     setTopicPositions(prevPositions => ({
       ...prevPositions,
@@ -371,7 +371,6 @@ export default function RadarPage() {
       onAddTopic={handleAddTopic}
       radarSize={radarSize}
       onRadarSizeChange={setRadarSize}
-      onScreenshot={handleScreenshot}
       onRegionConfigChange={handleRegionConfigChange}
       onRemoveRegion={handleRemoveRegion}
       onAddRegion={handleAddRegion}
@@ -412,7 +411,7 @@ export default function RadarPage() {
               regions={regions} 
               topics={topics} 
               topicPositions={topicPositions}
-              onTopicPositionChange={(...args) => handleTopicPositionChange(...args, regions)}
+              onTopicPositionChange={(...args) => handleTopicPositionChange(...args)}
               width={radarSize} 
               height={radarSize}
               topicDotColor={currentTheme.topicDotColor}
@@ -420,6 +419,10 @@ export default function RadarPage() {
         </div>
         <AdPlaceholder />
         <div className="flex justify-end gap-2">
+            <Button onClick={handleScreenshot} variant="outline">
+                <ImageDown className="mr-2 h-4 w-4" />
+                Screenshot
+            </Button>
             <Button onClick={handleExport} variant="outline">
                 <Download className="mr-2 h-4 w-4" />
                 Export
@@ -447,5 +450,7 @@ export default function RadarPage() {
     </div>
   );
 }
+
+    
 
     

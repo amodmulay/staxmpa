@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { BaseRegion, Region } from '@/types/lexigen';
-import { Download, PlusCircle, Settings2, Trash2 } from 'lucide-react';
+import { PlusCircle, Settings2, Trash2 } from 'lucide-react';
 import { hslToHex } from '@/lib/utils';
 import React from 'react';
 
@@ -21,7 +21,6 @@ interface RadarControlsProps {
   onAddTopic: (name: string, regionId: string) => void;
   radarSize: number;
   onRadarSizeChange: (size: number) => void;
-  onScreenshot: () => void;
   baseRegionDefinitions: BaseRegion[];
   onRegionConfigChange: (index: number, field: 'name' | 'color' | 'textColor', value: string) => void;
   onRemoveRegion: (id: string) => void;
@@ -34,7 +33,6 @@ export function RadarControls({
   onAddTopic,
   radarSize,
   onRadarSizeChange,
-  onScreenshot,
   baseRegionDefinitions,
   onRegionConfigChange,
   onRemoveRegion,
@@ -102,13 +100,6 @@ export function RadarControls({
               </div>
               
               <Separator />
-
-              <Button onClick={onScreenshot} className="w-full">
-                <Download className="mr-2 h-4 w-4" />
-                Capture Screenshot
-              </Button>
-              
-              <Separator />
             </div>
             
             <div className="flex flex-col flex-grow space-y-2">
@@ -159,3 +150,5 @@ export function RadarControls({
     </Tabs>
   )
 }
+
+    
