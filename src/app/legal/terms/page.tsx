@@ -1,6 +1,5 @@
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Terms of Service - StaxMap',
@@ -43,11 +42,7 @@ export default function TermsOfServicePage() {
 
       <h2>4. Governing Law</h2>
       <p>
-        These terms and conditions are governed by and construed in accordance with the laws of [Your Jurisdiction] and you irrevocably submit to the exclusive jurisdiction of the courts in that State or location.
-      </p>
-
-      <p className="text-sm text-muted-foreground mt-12">
-        <strong>Disclaimer:</strong> This is a template and not a substitute for legal advice. You should consult with a legal professional to ensure these terms are complete and appropriate for your needs. Please replace `[Your Jurisdiction]` with the correct information.
+        These terms and conditions are governed by and construed in accordance with the laws of Germany and you irrevocably submit to the exclusive jurisdiction of the courts in that State or location.
       </p>
     </>
   );

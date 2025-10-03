@@ -53,10 +53,6 @@ export default function PrivacyPolicyPage() {
         For any questions or concerns regarding your privacy, you may contact us using the details on our{' '}
         <Link href="/legal/impressum">Legal Notice</Link> page.
       </p>
-
-      <p className="text-sm text-muted-foreground mt-12">
-        <strong>Disclaimer:</strong> This is a template and not a substitute for legal advice. You should consult with a legal professional to ensure this policy is complete and appropriate for your needs.
-      </p>
     </>
   );
 }

@@ -12,40 +12,34 @@ export default function ImpressumPage() {
     <>
         <h1>Legal Notice (Impressum)</h1>
         
+        <h2>Contact Information</h2>
         <p>
-            <strong>[Your Company Name or Your Full Name]</strong>
+            Amod Mulay (LST)
             <br />
-            [Your Street Address]
+            Pippinger Str. 105
             <br />
-            [Your Postal Code and City]
+            81247 München
             <br />
-            [Your Country]
+            Germany
         </p>
+
+        <h2>Represented By</h2>
+        <p>Amod Mulay (LST)</p>
 
         <h2>Contact</h2>
         <p>
-            <strong>Telephone:</strong> [Your Phone Number]
-            <br />
-            <strong>Email:</strong> [Your Email Address]
+            <strong>Email:</strong> themvpletter@gmail.com
         </p>
 
+        <h2>Register Entry</h2>
+        <p>Private Website - Does not apply</p>
+        
         <h2>VAT ID</h2>
-        <p>
-            <strong>VAT identification number in accordance with §27a of the German Value Added Tax Act:</strong>
-            <br />
-            [Your VAT ID, if applicable]
-        </p>
-
-        <h2>Editorially Responsible</h2>
-        <p>
-            [Full Name of the person responsible for content]
-            <br />
-            [Address of the person responsible, if different from above]
-        </p>
+        <p>Private Website - Does not apply</p>
 
         <h2>Dispute Resolution</h2>
         <p>
-            The European Commission provides a platform for online dispute resolution (ODR):{' '}
+            The European Commission provides a platform for online dispute resolution (OS):{' '}
             <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
                 https://ec.europa.eu/consumers/odr
             </a>
@@ -55,8 +49,19 @@ export default function ImpressumPage() {
             We are not willing or obliged to participate in dispute resolution proceedings before a consumer arbitration board.
         </p>
         
-        <p className="text-sm text-muted-foreground mt-12">
-            <strong>Please replace all bracketed `[placeholder]` text with your actual information.</strong>
+        <h2>Disclaimer - Liability for Content</h2>
+        <p>
+          As a service provider, we are responsible for our own content on these pages in accordance with general laws pursuant to § 7 para. 1 TMG. According to §§ 8 to 10 TMG, however, we as a service provider are not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.
+        </p>
+
+        <h2>Liability for Links</h2>
+        <p>
+          Our offer contains links to external websites of third parties, on whose contents we have no influence. Therefore, we cannot assume any liability for these external contents. The respective provider or operator of the pages is always responsible for the content of the linked pages.
+        </p>
+        
+        <h2>Copyright</h2>
+        <p>
+          The content and works created by the site operators on these pages are subject to German copyright law. The reproduction, processing, distribution, and any kind of exploitation outside the limits of copyright require the written consent of the respective author or creator.
         </p>
     </>
   );
