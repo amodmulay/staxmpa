@@ -184,21 +184,19 @@ export default function RadarPage() {
     }
   };
 
-  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, newRegionId?: string) => {
+  const handleTopicPositionChange = (topicId: string, position: { x: number; y: number }, newRegionId: string) => {
     // Update visual position
     setTopicPositions(prevPositions => ({
       ...prevPositions,
       [topicId]: position,
     }));
     
-    // If a new region is determined, update the topic data
-    if (newRegionId) {
-        setTopics(prevTopics => 
-            prevTopics.map(topic => 
-                topic.id === topicId ? { ...topic, regionId: newRegionId } : topic
-            )
-        );
-    }
+    // Update the topic's regionId in the main state
+    setTopics(prevTopics => 
+        prevTopics.map(topic => 
+            topic.id === topicId ? { ...topic, regionId: newRegionId } : topic
+        )
+    );
   };
 
   const handleScreenshot = async () => {
@@ -411,7 +409,7 @@ export default function RadarPage() {
               regions={regions} 
               topics={topics} 
               topicPositions={topicPositions}
-              onTopicPositionChange={(...args) => handleTopicPositionChange(...args)}
+              onTopicPositionChange={handleTopicPositionChange}
               width={radarSize} 
               height={radarSize}
               topicDotColor={currentTheme.topicDotColor}

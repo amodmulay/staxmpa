@@ -11,7 +11,7 @@ interface DraggableTopicItemProps {
   region?: Region;
   topicDotColor?: string;
   initialPosition: { x: number; y: number };
-  onTopicPositionChange: (topicId: string, position: { x: number; y: number }, newRegionId?: string) => void;
+  onTopicPositionChange: (topicId: string, position: { x: number; y: number }, newRegionId: string) => void;
   options: {
       centerX: number;
       centerY: number;
@@ -53,7 +53,9 @@ export function DraggableTopicItem({
     // Get the new region's ID from the correctly ordered regions array
     const newRegionId = regions[newRegionIndex]?.id;
 
-    onTopicPositionChange(topic.id, { x, y }, newRegionId);
+    if (newRegionId) {
+        onTopicPositionChange(topic.id, { x, y }, newRegionId);
+    }
   };
 
   return (

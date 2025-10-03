@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useMemo, useCallback } from 'react';
@@ -8,7 +9,7 @@ interface RadarViewProps extends React.HTMLAttributes<HTMLDivElement> {
   regions: Region[];
   topics: Topic[];
   topicPositions: Record<string, { x: number; y: number }>;
-  onTopicPositionChange: (topicId: string, position: { x: number; y: number }, newRegionId?: string) => void;
+  onTopicPositionChange: (topicId: string, position: { x: number; y: number }, newRegionId: string) => void;
   width?: number;
   height?: number;
   topicDotColor?: string;
@@ -129,7 +130,7 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
                         bandThickness,
                         numRegions
                     }}
-                    regions={regions}
+                    regions={regions} // Pass the un-reversed regions array here
                 />
             ))}
           </svg>
