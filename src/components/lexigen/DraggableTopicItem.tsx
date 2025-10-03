@@ -18,7 +18,7 @@ interface DraggableTopicItemProps {
       bandThickness: number;
       numRegions: number;
   };
-  regions: Region[];
+  regions: Region[]; // IMPORTANT: This must be ordered from INNER to OUTER
 }
 
 const TOPIC_LABEL_OFFSET_Y = 18;
@@ -43,12 +43,14 @@ export function DraggableTopicItem({
     const deltaY = y - centerY;
     const distanceFromCenter = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-    // The regions prop is ordered from innermost to outermost.
+    // The `regions` prop is ordered from innermost to outermost.
+    // We can directly calculate the index from the distance.
     let newRegionIndex = Math.floor(distanceFromCenter / bandThickness);
     
     // Clamp the index to be within the bounds of the regions array.
     newRegionIndex = Math.min(Math.max(newRegionIndex, 0), numRegions - 1);
     
+    // Get the new region's ID from the correctly ordered regions array
     const newRegionId = regions[newRegionIndex]?.id;
 
     onTopicPositionChange(topic.id, { x, y }, newRegionId);

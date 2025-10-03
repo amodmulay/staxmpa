@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useMemo, useCallback } from 'react';
@@ -140,5 +139,3 @@ export const RadarView = React.forwardRef<HTMLDivElement, RadarViewProps>(
 );
 
 RadarView.displayName = "RadarView";
-
-    
