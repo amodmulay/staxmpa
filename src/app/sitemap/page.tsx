@@ -10,12 +10,21 @@ export const metadata: Metadata = {
   description: 'Navigate through all the pages available on StaxMap. Find links to the homepage, radar tool, and our educational content on technology radars.',
 };
 
-const sitemapLinks = [
+const mainLinks = [
     { href: '/', title: 'Home', description: 'The main landing page for StaxMap.' },
     { href: '/radar', title: 'Radar Tool', description: 'The interactive application for creating and managing your technology radar.' },
     { href: '/learn', title: 'Learn About Radars', description: 'An educational guide on the concepts and benefits of technology radars.' },
-    { href: '/sitemap.xml', title: 'XML Sitemap', description: 'The machine-readable sitemap for search engine crawlers.' },
 ];
+
+const legalLinks = [
+    { href: '/legal/impressum', title: 'Legal Notice (Impressum)', description: 'Publisher information and legal disclosures.' },
+    { href: '/legal/privacy', title: 'Privacy Policy', description: 'Information on how we handle your data.' },
+    { href: '/legal/terms', title: 'Terms of Service', description: 'The terms and conditions for using StaxMap.' },
+]
+
+const utilityLinks = [
+    { href: '/sitemap.xml', title: 'XML Sitemap', description: 'The machine-readable sitemap for search engine crawlers.' },
+]
 
 export default function SitemapPage() {
   return (
@@ -29,26 +38,68 @@ export default function SitemapPage() {
                     A complete guide to the pages on StaxMap.
                     </p>
                 </div>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Map className="text-primary" />
-                            Main Pages
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="space-y-4">
-                            {sitemapLinks.map(link => (
-                                <li key={link.href}>
-                                    <Link href={link.href} className="block p-4 rounded-lg hover:bg-muted" target={link.href.endsWith('.xml') ? '_blank' : undefined}>
-                                        <h3 className="font-semibold text-lg text-primary">{link.title}</h3>
-                                        <p className="text-muted-foreground text-sm">{link.description}</p>
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </CardContent>
-                </Card>
+                <div className="space-y-8">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Map className="text-primary" />
+                                Main Pages
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-4">
+                                {mainLinks.map(link => (
+                                    <li key={link.href}>
+                                        <Link href={link.href} className="block p-4 rounded-lg hover:bg-muted">
+                                            <h3 className="font-semibold text-lg text-primary">{link.title}</h3>
+                                            <p className="text-muted-foreground text-sm">{link.description}</p>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Map className="text-primary" />
+                                Legal
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-4">
+                                {legalLinks.map(link => (
+                                    <li key={link.href}>
+                                        <Link href={link.href} className="block p-4 rounded-lg hover:bg-muted">
+                                            <h3 className="font-semibold text-lg text-primary">{link.title}</h3>
+                                            <p className="text-muted-foreground text-sm">{link.description}</p>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Map className="text-primary" />
+                                Utility
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-4">
+                                {utilityLinks.map(link => (
+                                    <li key={link.href}>
+                                        <Link href={link.href} className="block p-4 rounded-lg hover:bg-muted" target="_blank">
+                                            <h3 className="font-semibold text-lg text-primary">{link.title}</h3>
+                                            <p className="text-muted-foreground text-sm">{link.description}</p>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </main>
     </div>

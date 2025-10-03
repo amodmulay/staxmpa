@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from '@/components/theme-provider';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import Script from 'next/script';
 import Link from 'next/link';
 import { BrainCircuit } from 'lucide-react';
 
@@ -46,8 +45,8 @@ export default function RootLayout({
               {children}
             </div>
             <footer className="bg-muted text-muted-foreground border-t">
-              <div className="container mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
+              <div className="container mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="md:col-span-2">
                   <div className="flex items-center gap-2 mb-2">
                     <BrainCircuit className="h-7 w-7 text-primary" />
                     <h3 className="text-xl font-semibold text-foreground">StaxMap</h3>
@@ -64,11 +63,12 @@ export default function RootLayout({
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-3">Resources</h4>
+                  <h4 className="font-semibold text-foreground mb-3">Legal</h4>
                   <ul className="space-y-2 text-sm">
+                    <li><Link href="/legal/impressum" className="hover:text-primary hover:underline underline-offset-4">Legal Notice</Link></li>
+                    <li><Link href="/legal/privacy" className="hover:text-primary hover:underline underline-offset-4">Privacy Policy</Link></li>
+                    <li><Link href="/legal/terms" className="hover:text-primary hover:underline underline-offset-4">Terms of Service</Link></li>
                     <li><Link href="/sitemap" className="hover:text-primary hover:underline underline-offset-4">Sitemap</Link></li>
-                    <li><a href="https://www.thoughtworks.com/en-de/radar" target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:underline underline-offset-4">Thoughtworks Radar</a></li>
-                    <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:underline underline-offset-4">GitHub (Coming Soon)</a></li>
                   </ul>
                 </div>
               </div>

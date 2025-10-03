@@ -2,7 +2,15 @@
 const URL = 'https://staxmap.com';
 
 function generateSiteMap() {
-  const routes = ['', '/radar', '/learn', '/sitemap'];
+  const routes = [
+    '', 
+    '/radar', 
+    '/learn', 
+    '/sitemap',
+    '/legal/impressum',
+    '/legal/privacy',
+    '/legal/terms'
+  ];
   return `<?xml version="1.0" encoding="UTF-8"?>
    <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
      ${routes
